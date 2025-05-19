@@ -3,8 +3,8 @@ import 'package:openstreetmap/features/map/data/datasources/location_remote_data
 import 'package:openstreetmap/features/map/data/datasources/map_remote_data_source.dart';
 import 'package:openstreetmap/features/map/domain/repositories/location_repository.dart';
 import 'package:openstreetmap/features/map/domain/repositories/map_repository.dart';
-import 'package:openstreetmap/features/map/domain/usecases/get_current_location.dart';
-import 'package:openstreetmap/features/map/domain/usecases/get_map_tile_url.dart';
+import 'package:openstreetmap/features/map/domain/usecases/get_current_location_use_case.dart';
+import 'package:openstreetmap/features/map/domain/usecases/get_map_tile_url_use_case.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_cubit.dart';
 
 final getIt = GetIt.instance;

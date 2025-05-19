@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_state.dart';
-import '../../domain/usecases/get_current_location.dart';
-import '../../domain/usecases/get_map_tile_url.dart';
+import '../../domain/usecases/get_current_location_use_case.dart';
+import '../../domain/usecases/get_map_tile_url_use_case.dart';
 
 @injectable
 class MapCubit extends Cubit<MapState> {
