@@ -62,8 +62,10 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                   ),
                   children: [
                     VectorTileLayer(
+                      maximumZoom: 19,
                       theme: state.style.theme,
                       tileProviders: state.style.providers,
+                      sprites: state.style.sprites,
                     ),
                     if (state.currentLocation != null)
                       MarkerLayer(
@@ -87,7 +89,9 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                                         height: 40,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: Colors.blue.withOpacity(0.3),
+                                          color: Colors.blue.withValues(
+                                            alpha: 0.3,
+                                          ),
                                         ),
                                       ),
                                     );
