@@ -45,6 +45,8 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
               currentLocation,
               gpsTraces,
               loadingGpsTraces,
+              showLocationMarker,
+              searchCenter,
             ) {
               if (_lastLocation != currentLocation) {
                 _mapController.move(currentLocation, 15.0);
@@ -83,6 +85,8 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                     currentLocation,
                     gpsTraces,
                     loadingGpsTraces,
+                    showLocationMarker,
+                    searchCenter,
                   ) => Stack(
                     children: [
                       Container(
@@ -113,46 +117,90 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                                   ),
                                 ],
                               ),
-                            MarkerLayer(
-                              markers: [
-                                Marker(
-                                  point: currentLocation,
-                                  width: 60,
-                                  height: 60,
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      AnimatedBuilder(
-                                        animation: _animationController,
-                                        builder: (context, child) {
-                                          final scale =
-                                              1.0 +
-                                              0.5 * _animationController.value;
-                                          return Transform.scale(
-                                            scale: scale,
-                                            child: Container(
-                                              width: 40,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.blue.withValues(
-                                                  alpha: 0.3,
+                            Builder(
+                              builder: (context) {
+                                if (searchCenter == null) {
+                                  return const SizedBox.shrink();
+                                }
+                                return PolygonLayer(
+                                  polygons: [
+                                    Polygon(
+                                      points: [
+                                        LatLng(
+                                          searchCenter.latitude -
+                                              kSearchHalfSideDegrees,
+                                          searchCenter.longitude -
+                                              kSearchHalfSideDegrees,
+                                        ),
+                                        LatLng(
+                                          searchCenter.latitude -
+                                              kSearchHalfSideDegrees,
+                                          searchCenter.longitude +
+                                              kSearchHalfSideDegrees,
+                                        ),
+                                        LatLng(
+                                          searchCenter.latitude +
+                                              kSearchHalfSideDegrees,
+                                          searchCenter.longitude +
+                                              kSearchHalfSideDegrees,
+                                        ),
+                                        LatLng(
+                                          searchCenter.latitude +
+                                              kSearchHalfSideDegrees,
+                                          searchCenter.longitude -
+                                              kSearchHalfSideDegrees,
+                                        ),
+                                      ],
+                                      color: Colors.blue.withValues(alpha: 0.2),
+                                      borderColor: Colors.blue,
+                                      borderStrokeWidth: 2.0,
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                            if (showLocationMarker)
+                              MarkerLayer(
+                                markers: [
+                                  Marker(
+                                    point: currentLocation,
+                                    width: 60,
+                                    height: 60,
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        AnimatedBuilder(
+                                          animation: _animationController,
+                                          builder: (context, child) {
+                                            final scale =
+                                                1.0 +
+                                                0.5 *
+                                                    _animationController.value;
+                                            return Transform.scale(
+                                              scale: scale,
+                                              child: Container(
+                                                width: 40,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.blue.withValues(
+                                                    alpha: 0.3,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                      const Icon(
-                                        Icons.my_location,
-                                        color: Colors.blue,
-                                        size: 32,
-                                      ),
-                                    ],
+                                            );
+                                          },
+                                        ),
+                                        const Icon(
+                                          Icons.my_location,
+                                          color: Colors.blue,
+                                          size: 32,
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
                           ],
                         ),
                       ),
@@ -166,11 +214,24 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.read<MapCubit>().locateMe();
-        },
-        child: const Icon(Icons.my_location),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              context.read<MapCubit>().locateMe();
+            },
+            child: const Icon(Icons.my_location),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            onPressed: () {
+              final center = _mapController.camera.center;
+              context.read<MapCubit>().searchTracesAt(center);
+            },
+            child: const Icon(Icons.search),
+          ),
+        ],
       ),
     );
   }
