@@ -21,10 +21,7 @@ class MyApp extends StatelessWidget {
       create: (context) => getIt<MapCubit>()..loadMap(),
       child: MaterialApp(
         title: 'Map App',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
+        theme: ThemeData.dark(),
         home: const MapPage(),
       ),
     );
