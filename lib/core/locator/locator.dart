@@ -26,10 +26,10 @@ void setupLocator() {
     () => MapRepository(getIt.get<MapRemoteDataSource>()),
   );
   getIt.registerLazySingleton<LocationRepository>(
-    () => LocationRepositoryImpl(getIt.get<LocationRemoteDataSource>()),
+    () => LocationRepository(getIt.get<LocationRemoteDataSource>()),
   );
   getIt.registerLazySingleton<MapRemoteDataSource>(() => MapRemoteDataSource());
   getIt.registerLazySingleton<LocationRemoteDataSource>(
-    () => LocationRemoteDataSourceImpl(),
+    () => LocationRemoteDataSource(),
   );
 }
