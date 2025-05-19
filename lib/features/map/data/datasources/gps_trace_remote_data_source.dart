@@ -11,7 +11,7 @@ class GpsTraceRemoteDataSource {
     int page,
   ) async {
     final url =
-        'https://api.openstreetmap.org/api/0.6/trackpoints?bbox=$left,$bottom,$right,$top&page=$page';
+        'https://api.openstreetmap.org/api/0.6/trackpoints?bbox=$left,$bottom,$right,$top&page=$page&limit=1000';
     final response = await http.get(Uri.parse(url));
     if (response.statusCode != 200) {
       throw Exception('Failed to load GPS traces');
