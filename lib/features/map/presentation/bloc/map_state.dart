@@ -1,4 +1,5 @@
 import 'package:vector_map_tiles/vector_map_tiles.dart';
+import 'package:latlong2/latlong.dart';
 
 sealed class MapState {
   const MapState();
@@ -14,7 +15,8 @@ class MapLoading extends MapState {
 
 class MapLoaded extends MapState {
   final Style style;
-  const MapLoaded(this.style);
+  final LatLng? currentLocation;
+  const MapLoaded(this.style, {this.currentLocation});
 }
 
 class MapError extends MapState {

@@ -1,21 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:openstreetmap/core/locator/locator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_state.dart';
 import 'package:vector_map_tiles/vector_map_tiles.dart';
 import '../bloc/map_cubit.dart';
 
-class MapPage extends StatelessWidget {
+class MapPage extends StatefulWidget {
   const MapPage({super.key});
 
   @override
+  State<MapPage> createState() => _MapPageState();
+}
+
+class _MapPageState extends State<MapPage> {
+  final MapController _mapController = MapController();
+  LatLng? _lastLocation;
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<MapCubit>()..loadMap(),
-      child: Scaffold(
-        appBar: AppBar(title: const Text('Map')),
-        body: BlocBuilder<MapCubit, Object>(
+    return Scaffold(
+      appBar: AppBar(title: const Text('Map')),
+      body: BlocListener<MapCubit, Object>(
+        listener: (context, state) {
+          if (state is MapLoaded && state.currentLocation != null) {
+            if (_lastLocation != state.currentLocation) {
+              _mapController.move(state.currentLocation!, 15.0);
+              _lastLocation = state.currentLocation;
+            }
+          }
+        },
+        child: BlocBuilder<MapCubit, Object>(
           builder: (context, state) {
             if (state is MapLoading) {
               return const Center(child: CircularProgressIndicator());
@@ -23,12 +38,32 @@ class MapPage extends StatelessWidget {
               return Container(
                 color: Colors.grey[300],
                 child: FlutterMap(
-                  options: MapOptions(),
+                  mapController: _mapController,
+                  options: MapOptions(
+                    initialCenter:
+                        state.currentLocation ?? const LatLng(48.8566, 2.3522),
+                    initialZoom: state.currentLocation != null ? 15.0 : 12.0,
+                  ),
                   children: [
                     VectorTileLayer(
                       theme: state.style.theme,
                       tileProviders: state.style.providers,
                     ),
+                    if (state.currentLocation != null)
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            point: state.currentLocation!,
+                            width: 40,
+                            height: 40,
+                            child: const Icon(
+                              Icons.my_location,
+                              color: Colors.blue,
+                              size: 40,
+                            ),
+                          ),
+                        ],
+                      ),
                   ],
                 ),
               );
@@ -38,12 +73,12 @@ class MapPage extends StatelessWidget {
             return const SizedBox();
           },
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // Implement getCurrentLocation logic here
-          },
-          child: const Icon(Icons.my_location),
-        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          context.read<MapCubit>().locateMe();
+        },
+        child: const Icon(Icons.my_location),
       ),
     );
   }
