@@ -34,16 +34,35 @@ class MapCubit extends Cubit<MapState> {
       final double right = lon + halfBox;
       final double bottom = lat - halfBox;
       final double top = lat + halfBox;
-      final traces = await getPublicGpsTraces.run(left, bottom, right, top, 0);
-
-      if (state is MapLoaded) {
+      final style = state.maybeWhen(
+        loaded: (style) => style,
+        loadedWithLocation: (style, _, __, ___) => style,
+        orElse: () => null,
+      );
+      if (style != null) {
         emit(
           MapState.loadedWithLocation(
-            style: (state as MapLoaded).style,
+            style: style,
             currentLocation: location,
-            gpsTraces: traces,
+            gpsTraces: const [],
+            loadingGpsTraces: true,
           ),
         );
+        getPublicGpsTraces
+            .run(left, bottom, right, top, 0)
+            .then((traces) {
+              emit(
+                MapState.loadedWithLocation(
+                  style: style,
+                  currentLocation: location,
+                  gpsTraces: traces,
+                  loadingGpsTraces: false,
+                ),
+              );
+            })
+            .catchError((e) {
+              emit(MapState.error('Failed to get traces: $e'));
+            });
       }
     } catch (e) {
       emit(MapState.error('Failed to get location or traces: $e'));

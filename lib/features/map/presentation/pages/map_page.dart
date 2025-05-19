@@ -40,7 +40,12 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
       body: BlocListener<MapCubit, MapState>(
         listener: (context, state) {
           state.maybeWhen(
-            loadedWithLocation: (style, currentLocation, gpsTraces) {
+            loadedWithLocation: (
+              style,
+              currentLocation,
+              gpsTraces,
+              loadingGpsTraces,
+            ) {
               if (_lastLocation != currentLocation) {
                 _mapController.move(currentLocation, 15.0);
                 _lastLocation = currentLocation;
@@ -73,76 +78,87 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                     ),
                   ),
               loadedWithLocation:
-                  (style, currentLocation, gpsTraces) => Container(
-                    color: Colors.grey[300],
-                    child: FlutterMap(
-                      mapController: _mapController,
-                      options: MapOptions(
-                        initialCenter: currentLocation,
-                        initialZoom: 15.0,
-                      ),
-                      children: [
-                        VectorTileLayer(
-                          maximumZoom: 19,
-                          theme: style.theme,
-                          tileProviders: style.providers,
-                          sprites: style.sprites,
-                        ),
-                        if (gpsTraces.isNotEmpty)
-                          PolylineLayer(
-                            polylines: [
-                              Polyline(
-                                points:
-                                    gpsTraces
-                                        .map((e) => LatLng(e.lat, e.lon))
-                                        .toList(),
-                                color: Colors.red,
-                                strokeWidth: 3.0,
-                              ),
-                            ],
+                  (
+                    style,
+                    currentLocation,
+                    gpsTraces,
+                    loadingGpsTraces,
+                  ) => Stack(
+                    children: [
+                      Container(
+                        color: Colors.grey[300],
+                        child: FlutterMap(
+                          mapController: _mapController,
+                          options: MapOptions(
+                            initialCenter: currentLocation,
+                            initialZoom: 15.0,
                           ),
-                        MarkerLayer(
-                          markers: [
-                            Marker(
-                              point: currentLocation,
-                              width: 60,
-                              height: 60,
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  AnimatedBuilder(
-                                    animation: _animationController,
-                                    builder: (context, child) {
-                                      final scale =
-                                          1.0 +
-                                          0.5 * _animationController.value;
-                                      return Transform.scale(
-                                        scale: scale,
-                                        child: Container(
-                                          width: 40,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.blue.withValues(
-                                              alpha: 0.3,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  const Icon(
-                                    Icons.my_location,
-                                    color: Colors.blue,
-                                    size: 32,
+                          children: [
+                            VectorTileLayer(
+                              maximumZoom: 19,
+                              theme: style.theme,
+                              tileProviders: style.providers,
+                              sprites: style.sprites,
+                            ),
+                            if (gpsTraces.isNotEmpty)
+                              PolylineLayer(
+                                polylines: [
+                                  Polyline(
+                                    points:
+                                        gpsTraces
+                                            .map((e) => LatLng(e.lat, e.lon))
+                                            .toList(),
+                                    color: Colors.red,
+                                    strokeWidth: 3.0,
                                   ),
                                 ],
                               ),
+                            MarkerLayer(
+                              markers: [
+                                Marker(
+                                  point: currentLocation,
+                                  width: 60,
+                                  height: 60,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      AnimatedBuilder(
+                                        animation: _animationController,
+                                        builder: (context, child) {
+                                          final scale =
+                                              1.0 +
+                                              0.5 * _animationController.value;
+                                          return Transform.scale(
+                                            scale: scale,
+                                            child: Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.blue.withValues(
+                                                  alpha: 0.3,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      const Icon(
+                                        Icons.my_location,
+                                        color: Colors.blue,
+                                        size: 32,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                      if (loadingGpsTraces)
+                        const Center(child: CircularProgressIndicator()),
+                    ],
                   ),
               error: (msg) => Center(child: Text(msg)),
               initial: () => const SizedBox(),

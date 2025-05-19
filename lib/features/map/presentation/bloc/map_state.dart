@@ -14,6 +14,7 @@ class MapState with _$MapState {
     required Style style,
     required LatLng currentLocation,
     @Default(<GpsTrackPointEntity>[]) List<GpsTrackPointEntity> gpsTraces,
+    @Default(false) bool loadingGpsTraces,
   }) = MapLoadedWithLocation;
   const factory MapState.error(String message) = MapError;
 }
