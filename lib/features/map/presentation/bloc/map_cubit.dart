@@ -5,7 +5,7 @@ import '../../domain/usecases/get_current_location.dart';
 import '../../domain/usecases/get_map_tile_url.dart';
 
 @injectable
-class MapCubit extends Cubit<Object> {
+class MapCubit extends Cubit<MapState> {
   final GetMapConfigUseCase getMapConfig;
   final GetCurrentLocationUseCase getCurrentLocation;
 

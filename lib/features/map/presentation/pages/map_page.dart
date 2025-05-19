@@ -13,15 +13,31 @@ class MapPage extends StatefulWidget {
   State<MapPage> createState() => _MapPageState();
 }
 
-class _MapPageState extends State<MapPage> {
+class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   final MapController _mapController = MapController();
   LatLng? _lastLocation;
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Map')),
-      body: BlocListener<MapCubit, Object>(
+      body: BlocListener<MapCubit, MapState>(
         listener: (context, state) {
           if (state is MapLoaded && state.currentLocation != null) {
             if (_lastLocation != state.currentLocation) {
@@ -30,7 +46,7 @@ class _MapPageState extends State<MapPage> {
             }
           }
         },
-        child: BlocBuilder<MapCubit, Object>(
+        child: BlocBuilder<MapCubit, MapState>(
           builder: (context, state) {
             if (state is MapLoading) {
               return const Center(child: CircularProgressIndicator());
@@ -54,12 +70,35 @@ class _MapPageState extends State<MapPage> {
                         markers: [
                           Marker(
                             point: state.currentLocation!,
-                            width: 40,
-                            height: 40,
-                            child: const Icon(
-                              Icons.my_location,
-                              color: Colors.blue,
-                              size: 40,
+                            width: 60,
+                            height: 60,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                AnimatedBuilder(
+                                  animation: _animationController,
+                                  builder: (context, child) {
+                                    final scale =
+                                        1.0 + 0.5 * _animationController.value;
+                                    return Transform.scale(
+                                      scale: scale,
+                                      child: Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.blue.withOpacity(0.3),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                const Icon(
+                                  Icons.my_location,
+                                  color: Colors.blue,
+                                  size: 32,
+                                ),
+                              ],
                             ),
                           ),
                         ],
