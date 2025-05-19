@@ -8,7 +8,7 @@ class GetCurrentLocationUseCase {
 
   GetCurrentLocationUseCase(this.repository);
 
-  Future<LatLng> call() async {
+  Future<LatLng> run() async {
     final hasPermission = await repository.checkLocationPermission();
     if (!hasPermission) {
       final granted = await repository.requestLocationPermission();

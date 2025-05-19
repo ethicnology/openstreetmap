@@ -1,25 +1,19 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:vector_map_tiles/vector_map_tiles.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:openstreetmap/features/map/domain/entities/gps_track_point_entity.dart';
 
-sealed class MapState {
-  const MapState();
-}
+part 'map_state.freezed.dart';
 
-class MapInitial extends MapState {
-  const MapInitial();
-}
-
-class MapLoading extends MapState {
-  const MapLoading();
-}
-
-class MapLoaded extends MapState {
-  final Style style;
-  final LatLng? currentLocation;
-  const MapLoaded(this.style, {this.currentLocation});
-}
-
-class MapError extends MapState {
-  final String message;
-  const MapError(this.message);
+@freezed
+class MapState with _$MapState {
+  const factory MapState.initial() = MapInitial;
+  const factory MapState.loading() = MapLoading;
+  const factory MapState.loaded({required Style style}) = MapLoaded;
+  const factory MapState.loadedWithLocation({
+    required Style style,
+    required LatLng currentLocation,
+    @Default(<GpsTrackPointEntity>[]) List<GpsTrackPointEntity> gpsTraces,
+  }) = MapLoadedWithLocation;
+  const factory MapState.error(String message) = MapError;
 }

@@ -43,6 +43,9 @@ dependencies:
   injectable: ^2.3.2
   latlong2: ^0.9.1
   geolocator: ^11.0.0
+  freezed_annotation: ^2.4.1
+  http: ^1.4.0
+  xml: ^6.5.0
 
 dev_dependencies:
   flutter_test:
@@ -56,6 +59,7 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   injectable_generator: ^2.4.1
   build_runner: ^2.4.8
+  freezed: ^2.4.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
