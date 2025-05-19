@@ -11,13 +11,16 @@ final getIt = GetIt.instance;
 
 void setupLocator() {
   getIt.registerFactory<MapCubit>(
-    () => MapCubit(getIt.get<GetMapConfig>(), getIt.get<GetCurrentLocation>()),
+    () => MapCubit(
+      getIt.get<GetMapConfigUseCase>(),
+      getIt.get<GetCurrentLocationUseCase>(),
+    ),
   );
-  getIt.registerLazySingleton<GetMapConfig>(
-    () => GetMapConfig(getIt.get<MapRepository>()),
+  getIt.registerLazySingleton<GetMapConfigUseCase>(
+    () => GetMapConfigUseCase(getIt.get<MapRepository>()),
   );
-  getIt.registerLazySingleton<GetCurrentLocation>(
-    () => GetCurrentLocation(getIt.get<LocationRepository>()),
+  getIt.registerLazySingleton<GetCurrentLocationUseCase>(
+    () => GetCurrentLocationUseCase(getIt.get<LocationRepository>()),
   );
   getIt.registerLazySingleton<MapRepository>(
     () => MapRepository(getIt.get<MapRemoteDataSource>()),

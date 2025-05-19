@@ -3,10 +3,10 @@ import 'package:latlong2/latlong.dart';
 import '../repositories/location_repository.dart';
 
 @injectable
-class GetCurrentLocation {
+class GetCurrentLocationUseCase {
   final LocationRepository repository;
 
-  GetCurrentLocation(this.repository);
+  GetCurrentLocationUseCase(this.repository);
 
   Future<LatLng> call() async {
     final hasPermission = await repository.checkLocationPermission();
