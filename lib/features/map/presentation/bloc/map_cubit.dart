@@ -3,7 +3,7 @@ import 'package:injectable/injectable.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_state.dart';
 import 'package:openstreetmap/features/map/domain/usecases/get_current_location_use_case.dart';
 import 'package:openstreetmap/features/map/domain/usecases/get_map_tile_url_use_case.dart';
-import 'package:openstreetmap/features/map/domain/usecases/get_public_gps_traces_use_case.dart';
+import 'package:openstreetmap/features/map/domain/usecases/get_traces_use_case.dart';
 import 'package:latlong2/latlong.dart';
 
 const double kSearchHalfSideDegrees = 0.01425;
@@ -12,7 +12,7 @@ const double kSearchHalfSideDegrees = 0.01425;
 class MapCubit extends Cubit<MapState> {
   final GetMapConfigUseCase getMapConfig;
   final GetCurrentLocationUseCase getCurrentLocation;
-  final GetPublicGpsTracesUseCase getPublicGpsTraces;
+  final GetTracesUseCase getPublicGpsTraces;
 
   MapCubit(this.getMapConfig, this.getCurrentLocation, this.getPublicGpsTraces)
     : super(const MapState.initial());
@@ -47,7 +47,7 @@ class MapCubit extends Cubit<MapState> {
           MapState.loadedWithLocation(
             style: style,
             currentLocation: location,
-            gpsTraces: const [],
+            traces: const [],
             loadingGpsTraces: true,
             showLocationMarker: true,
           ),
@@ -59,7 +59,7 @@ class MapCubit extends Cubit<MapState> {
                 MapState.loadedWithLocation(
                   style: style,
                   currentLocation: location,
-                  gpsTraces: traces,
+                  traces: traces,
                   loadingGpsTraces: false,
                   showLocationMarker: true,
                 ),
@@ -98,7 +98,7 @@ class MapCubit extends Cubit<MapState> {
           MapState.loadedWithLocation(
             style: style,
             currentLocation: currentLocation,
-            gpsTraces: const [],
+            traces: const [],
             loadingGpsTraces: true,
             showLocationMarker: false,
             searchCenter: center,
@@ -111,7 +111,7 @@ class MapCubit extends Cubit<MapState> {
                 MapState.loadedWithLocation(
                   style: style,
                   currentLocation: currentLocation,
-                  gpsTraces: traces,
+                  traces: traces,
                   loadingGpsTraces: false,
                   showLocationMarker: false,
                   searchCenter: center,
