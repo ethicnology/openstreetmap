@@ -195,8 +195,7 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
 
   Widget _buildSquareOverlay() {
     final center = _mapController.camera.center;
-    final zoom = _mapController.camera.zoom;
-    final bounds = _calculateBounds(center, zoom);
+    final bounds = _calculateBounds(center);
 
     return PolygonLayer(
       polygons: [
@@ -217,14 +216,12 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
 
   ({double north, double south, double east, double west}) _calculateBounds(
     LatLng center,
-    double zoom,
   ) {
-    final distance = 0.1 * (1 / zoom);
     return (
-      north: center.latitude + distance,
-      south: center.latitude - distance,
-      east: center.longitude + distance,
-      west: center.longitude - distance,
+      north: center.latitude + kSearchHalfSideDegrees,
+      south: center.latitude - kSearchHalfSideDegrees,
+      east: center.longitude + kSearchHalfSideDegrees,
+      west: center.longitude - kSearchHalfSideDegrees,
     );
   }
 
