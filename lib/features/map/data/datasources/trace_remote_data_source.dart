@@ -15,34 +15,33 @@ class TraceRemoteDataSource {
     );
     final response = await http.get(uri);
 
+    print(uri.toString());
+
     if (response.statusCode == 200) {
       final document = XmlDocument.parse(response.body);
       final tracks = document.findAllElements('trk');
       final List<TraceModel> traces = [];
 
       for (final track in tracks) {
-        final name = track.findElements('name').firstOrNull?.value ?? 'Unknown';
-        final description = track.findElements('desc').firstOrNull?.value ?? '';
-        final url = track.findElements('url').firstOrNull?.value ?? '';
+        final name =
+            track.findElements('name').firstOrNull?.innerText ?? 'Unknown';
+        final description =
+            track.findElements('desc').firstOrNull?.innerText ?? '';
+        final url = track.findElements('url').firstOrNull?.innerText ?? '';
         final trackPoints = track.findAllElements('trkpt');
-
         final points =
             trackPoints.map((point) {
-              final lat = double.parse(point.getAttribute('lat')!);
-              final lon = double.parse(point.getAttribute('lon')!);
-              final eleElem = point.findElements('ele').firstOrNull;
-              final timeElem = point.findElements('time').firstOrNull;
+              final lat = double.parse(point.getAttribute('lat') ?? '0');
+              final lon = double.parse(point.getAttribute('lon') ?? '0');
+              final timeStr = point.findElements('time').firstOrNull?.innerText;
+              final time = timeStr != null ? DateTime.parse(timeStr) : null;
+              final eleStr = point.findElements('ele').firstOrNull?.innerText;
+              final elevation = eleStr != null ? double.parse(eleStr) : 0.0;
               return TracePointModel(
                 latitude: lat,
                 longitude: lon,
-                elevation:
-                    eleElem != null && eleElem.value != null
-                        ? double.parse(eleElem.value!)
-                        : null,
-                time:
-                    timeElem != null && timeElem.value != null
-                        ? DateTime.parse(timeElem.value!)
-                        : null,
+                elevation: elevation,
+                time: time,
               );
             }).toList();
 
@@ -58,7 +57,7 @@ class TraceRemoteDataSource {
 
       return traces;
     } else {
-      throw Exception('Failed to load track points');
+      throw Exception('Failed to load traces: ${response.statusCode}');
     }
   }
 }
