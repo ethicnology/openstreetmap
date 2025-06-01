@@ -46,6 +46,10 @@ dependencies:
   freezed_annotation: ^2.4.1
   http: ^1.4.0
   xml: ^6.5.0
+  drift: ^2.26.1
+  sqlite3_flutter_libs: ^0.5.32
+  path_provider: ^2.1.5
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:
@@ -60,6 +64,7 @@ dev_dependencies:
   injectable_generator: ^2.4.1
   build_runner: ^2.4.8
   freezed: ^2.4.7
+  drift_dev: ^2.26.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
