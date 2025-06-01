@@ -124,18 +124,56 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
     );
   }
 
+  Map<List<LatLng>, int> _groupSegmentsByIntensity(List<TraceEntity> traces) {
+    final Map<String, int> segmentCounts = {};
+    final Map<String, List<LatLng>> segmentKeys = {};
+    for (final trace in traces) {
+      for (var i = 0; i < trace.points.length - 1; i++) {
+        final a = LatLng(trace.points[i].latitude, trace.points[i].longitude);
+        final b = LatLng(
+          trace.points[i + 1].latitude,
+          trace.points[i + 1].longitude,
+        );
+        final key = _segmentKey(a, b);
+        segmentCounts[key] = (segmentCounts[key] ?? 0) + 1;
+        segmentKeys[key] = [a, b];
+      }
+    }
+    final Map<List<LatLng>, int> result = {};
+    for (final entry in segmentCounts.entries) {
+      result[segmentKeys[entry.key]!] = entry.value;
+    }
+    return result;
+  }
+
+  String _segmentKey(LatLng a, LatLng b) {
+    final points = [
+      '${a.latitude},${a.longitude}',
+      '${b.latitude},${b.longitude}',
+    ]..sort();
+    return points.join('|');
+  }
+
   Widget _buildTracesLayer(List<TraceEntity> traces) {
+    final segments = _groupSegmentsByIntensity(traces);
+    int maxIntensity = 1;
+    if (segments.isNotEmpty) {
+      maxIntensity = segments.values.reduce((a, b) => a > b ? a : b);
+    }
     return PolylineLayer(
       polylines:
-          traces.map((trace) {
-            final points =
-                trace.points
-                    .map((point) => LatLng(point.latitude, point.longitude))
-                    .toList();
+          segments.entries.map((entry) {
+            final intensity = entry.value;
+            final color =
+                Color.lerp(
+                  Colors.red.withOpacity(0.3),
+                  Colors.red,
+                  intensity / maxIntensity,
+                )!;
             return Polyline(
-              points: points,
-              color: Colors.red,
-              strokeWidth: 3.0,
+              points: entry.key,
+              color: color,
+              strokeWidth: 3.0 + (intensity - 1) * 2.0,
             );
           }).toList(),
     );
