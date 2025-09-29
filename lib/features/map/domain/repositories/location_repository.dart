@@ -4,9 +4,9 @@ import '../../data/datasources/location_remote_data_source.dart';
 
 @LazySingleton()
 class LocationRepository {
-  final LocationRemoteDataSource remoteDataSource;
+  final remoteDataSource = LocationRemoteDataSource();
 
-  LocationRepository(this.remoteDataSource);
+  LocationRepository();
 
   Future<LatLng> getCurrentLocation() async {
     return await remoteDataSource.getCurrentLocation();

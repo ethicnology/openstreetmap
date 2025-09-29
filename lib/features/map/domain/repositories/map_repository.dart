@@ -4,9 +4,9 @@ import '../../data/datasources/map_remote_data_source.dart';
 
 @LazySingleton()
 class MapRepository {
-  final MapRemoteDataSource remoteDataSource;
+  final remoteDataSource = MapRemoteDataSource();
 
-  MapRepository(this.remoteDataSource);
+  MapRepository();
 
   Future<Style> getMapConfig() async {
     return await remoteDataSource.getMapConfig();

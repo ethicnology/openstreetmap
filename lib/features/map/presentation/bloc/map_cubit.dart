@@ -10,12 +10,11 @@ const double kSearchHalfSideDegrees = 0.01425;
 
 @injectable
 class MapCubit extends Cubit<MapState> {
-  final GetMapConfigUseCase getMapConfig;
-  final GetCurrentLocationUseCase getCurrentLocation;
-  final GetTracesUseCase getPublicGpsTraces;
+  final getMapConfig = GetMapConfigUseCase();
+  final getCurrentLocation = GetCurrentLocationUseCase();
+  final getPublicGpsTraces = GetTracesUseCase();
 
-  MapCubit(this.getMapConfig, this.getCurrentLocation, this.getPublicGpsTraces)
-    : super(const MapState.initial());
+  MapCubit() : super(const MapState.initial());
 
   Future<void> loadMap() async {
     emit(const MapState.loading());
@@ -30,13 +29,7 @@ class MapCubit extends Cubit<MapState> {
   Future<void> locateMe() async {
     try {
       final location = await getCurrentLocation.run();
-      final double lat = location.latitude;
-      final double lon = location.longitude;
-      final double halfBox = kSearchHalfSideDegrees;
-      final double left = lon - halfBox;
-      final double right = lon + halfBox;
-      final double bottom = lat - halfBox;
-      final double top = lat + halfBox;
+
       final style = state.maybeWhen(
         loaded: (style) => style,
         loadedWithLocation: (style, _, __, ___, ____, _____) => style,
@@ -52,22 +45,6 @@ class MapCubit extends Cubit<MapState> {
             showLocationMarker: true,
           ),
         );
-        getPublicGpsTraces
-            .run(left, bottom, right, top, 0)
-            .then((traces) {
-              emit(
-                MapState.loadedWithLocation(
-                  style: style,
-                  currentLocation: location,
-                  traces: traces,
-                  loadingGpsTraces: false,
-                  showLocationMarker: true,
-                ),
-              );
-            })
-            .catchError((e) {
-              emit(MapState.error('Failed to get traces: $e'));
-            });
       }
     } catch (e) {
       emit(MapState.error('Failed to get location or traces: $e'));

@@ -17,34 +17,15 @@ final getIt = GetIt.instance;
 void setupLocator() {
   getIt.registerLazySingleton<LocalDatabase>(() => LocalDatabase());
 
-  getIt.registerFactory<MapCubit>(
-    () => MapCubit(
-      getIt.get<GetMapConfigUseCase>(),
-      getIt.get<GetCurrentLocationUseCase>(),
-      getIt.get<GetTracesUseCase>(),
-    ),
-  );
-  getIt.registerLazySingleton<GetMapConfigUseCase>(
-    () => GetMapConfigUseCase(getIt.get<MapRepository>()),
-  );
+  getIt.registerFactory<MapCubit>(() => MapCubit());
+  getIt.registerLazySingleton<GetMapConfigUseCase>(() => GetMapConfigUseCase());
   getIt.registerLazySingleton<GetCurrentLocationUseCase>(
-    () => GetCurrentLocationUseCase(getIt.get<LocationRepository>()),
+    () => GetCurrentLocationUseCase(),
   );
-  getIt.registerLazySingleton<GetTracesUseCase>(
-    () => GetTracesUseCase(getIt.get<TraceRepository>()),
-  );
-  getIt.registerLazySingleton<MapRepository>(
-    () => MapRepository(getIt.get<MapRemoteDataSource>()),
-  );
-  getIt.registerLazySingleton<LocationRepository>(
-    () => LocationRepository(getIt.get<LocationRemoteDataSource>()),
-  );
-  getIt.registerLazySingleton<TraceRepository>(
-    () => TraceRepository(
-      getIt.get<TraceRemoteDataSource>(),
-      getIt.get<TraceLocalDataSource>(),
-    ),
-  );
+  getIt.registerLazySingleton<GetTracesUseCase>(() => GetTracesUseCase());
+  getIt.registerLazySingleton<MapRepository>(() => MapRepository());
+  getIt.registerLazySingleton<LocationRepository>(() => LocationRepository());
+  getIt.registerLazySingleton<TraceRepository>(() => TraceRepository());
   getIt.registerLazySingleton<MapRemoteDataSource>(() => MapRemoteDataSource());
   getIt.registerLazySingleton<LocationRemoteDataSource>(
     () => LocationRemoteDataSource(),
@@ -53,6 +34,6 @@ void setupLocator() {
     () => TraceRemoteDataSource(),
   );
   getIt.registerLazySingleton<TraceLocalDataSource>(
-    () => TraceLocalDataSource(getIt.get<LocalDatabase>()),
+    () => TraceLocalDataSource(),
   );
 }

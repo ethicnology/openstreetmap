@@ -4,9 +4,9 @@ import '../repositories/map_repository.dart';
 
 @injectable
 class GetMapConfigUseCase {
-  final MapRepository repository;
+  final repository = MapRepository();
 
-  GetMapConfigUseCase(this.repository);
+  GetMapConfigUseCase();
 
   Future<Style> run() async => await repository.getMapConfig();
 }

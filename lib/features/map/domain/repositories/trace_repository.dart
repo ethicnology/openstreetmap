@@ -4,10 +4,10 @@ import 'package:openstreetmap/features/map/domain/entities/trace_entity.dart';
 import 'package:openstreetmap/features/map/data/mappers/trace_mapper.dart';
 
 class TraceRepository {
-  final TraceRemoteDataSource remoteTraces;
-  final TraceLocalDataSource localTraces;
+  final remoteTraces = TraceRemoteDataSource();
+  final localTraces = TraceLocalDataSource();
 
-  TraceRepository(this.remoteTraces, this.localTraces);
+  TraceRepository();
 
   Future<List<TraceEntity>> fetch(
     double left,

@@ -166,7 +166,7 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
             final intensity = entry.value;
             final color =
                 Color.lerp(
-                  Colors.red.withOpacity(0.3),
+                  Colors.red.withAlpha(30),
                   Colors.red,
                   intensity / maxIntensity,
                 )!;
@@ -200,7 +200,7 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                       height: 40,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.blue.withOpacity(0.3),
+                        color: Colors.blue,
                       ),
                     ),
                   );
@@ -244,8 +244,8 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
             LatLng(bounds.south, bounds.east),
             LatLng(bounds.south, bounds.west),
           ],
-          color: Colors.blue.withOpacity(0.2),
-          borderColor: Colors.blue,
+          color: Colors.blue.withAlpha(30),
+          borderColor: Colors.blue.withAlpha(60),
           borderStrokeWidth: 2.0,
         ),
       ],

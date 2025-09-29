@@ -2,8 +2,8 @@ import 'package:openstreetmap/features/map/domain/entities/trace_entity.dart';
 import 'package:openstreetmap/features/map/domain/repositories/trace_repository.dart';
 
 class GetTracesUseCase {
-  final TraceRepository repository;
-  GetTracesUseCase(this.repository);
+  final repository = TraceRepository();
+  GetTracesUseCase();
 
   Future<List<TraceEntity>> run(
     double left,
