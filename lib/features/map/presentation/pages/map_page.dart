@@ -15,86 +15,86 @@ class MapPage extends StatefulWidget {
   State<MapPage> createState() => _MapPageState();
 }
 
-class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
+class _MapPageState extends State<MapPage> {
   final _mapController = MapController();
-  late final AnimationController _animationController;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<MapBloc>();
+
     return Scaffold(
       body: BlocBuilder<MapBloc, MapState>(
         builder: (context, state) {
+          final location =
+              state.currentLocation ??
+              state.searchCenter ??
+              const LatLng(48.8566, 2.3522);
+
+          final zoom =
+              (state.currentLocation != null || state.searchCenter != null)
+                  ? 15.0
+                  : 13.0;
+
           if (state.errorMessage != null) {
             return Center(child: Text(state.errorMessage!.message));
           }
-
+          if (state.style == null) {
+            return const Center(child: Text('Loading map...'));
+          }
           if (state.isLoading && state.style == null) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (state.style == null) {
-            return const Center(child: Text('Loading map...'));
-          }
-
-          return _buildMap(state);
+          return Stack(
+            children: [
+              Container(
+                color: Colors.grey[300],
+                child: FlutterMap(
+                  mapController: _mapController,
+                  options: MapOptions(
+                    initialCenter: location,
+                    initialZoom: zoom,
+                  ),
+                  children: [
+                    VectorTileLayer(
+                      maximumZoom: 19,
+                      theme: state.style!.theme,
+                      tileProviders: state.style!.providers,
+                      sprites: state.style!.sprites,
+                    ),
+                    if (state.traces.isNotEmpty)
+                      _buildTracesLayer(state.traces),
+                    if (state.showLocationMarker &&
+                        state.currentLocation != null)
+                      _buildLocationMarker(state.currentLocation!),
+                    if (state.searchCenter != null && state.isLoading)
+                      _buildSquareOverlay(),
+                  ],
+                ),
+              ),
+              if (state.isLoading)
+                const Center(child: CircularProgressIndicator()),
+            ],
+          );
         },
       ),
-      floatingActionButton: _buildFloatingActionButtons(),
-    );
-  }
-
-  Widget _buildMap(MapState state) {
-    final location =
-        state.currentLocation ??
-        state.searchCenter ??
-        const LatLng(48.8566, 2.3522);
-
-    final zoom =
-        (state.currentLocation != null || state.searchCenter != null)
-            ? 15.0
-            : 13.0;
-
-    return Stack(
-      children: [
-        Container(
-          color: Colors.grey[300],
-          child: FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(initialCenter: location, initialZoom: zoom),
-            children: [
-              VectorTileLayer(
-                maximumZoom: 19,
-                theme: state.style!.theme,
-                tileProviders: state.style!.providers,
-                sprites: state.style!.sprites,
-              ),
-              if (state.traces.isNotEmpty) _buildTracesLayer(state.traces),
-              if (state.showLocationMarker && state.currentLocation != null)
-                _buildLocationMarker(state.currentLocation!),
-              if (state.searchCenter != null)
-                _buildSearchMarker(state.searchCenter!),
-              if (state.currentLocation != null || state.searchCenter != null)
-                _buildSquareOverlay(),
-            ],
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () => bloc.add(const LocationRequested()),
+            child: const Icon(Icons.my_location),
           ),
-        ),
-        if (state.isLoading) const Center(child: CircularProgressIndicator()),
-      ],
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            onPressed: () {
+              final center = _mapController.camera.center;
+              bloc.add(TracesRequested(center: center));
+            },
+            child: const Icon(Icons.search),
+          ),
+        ],
+      ),
     );
   }
 
@@ -160,46 +160,7 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
           point: location,
           width: 40,
           height: 40,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              AnimatedBuilder(
-                animation: _animationController,
-                builder: (context, child) {
-                  final scale = 1.0 + 0.5 * _animationController.value;
-                  return Transform.scale(
-                    scale: scale,
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              const Icon(Icons.my_location, color: Colors.blue, size: 32),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSearchMarker(LatLng location) {
-    return MarkerLayer(
-      markers: [
-        Marker(
-          point: location,
-          width: 40,
-          height: 40,
-          child: const Icon(
-            Icons.location_searching,
-            color: Colors.red,
-            size: 32,
-          ),
+          child: const Icon(Icons.my_location, color: Colors.white, size: 24),
         ),
       ],
     );
@@ -235,27 +196,6 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
       south: center.latitude - kSearchHalfSideDegrees,
       east: center.longitude + kSearchHalfSideDegrees,
       west: center.longitude - kSearchHalfSideDegrees,
-    );
-  }
-
-  Widget _buildFloatingActionButtons() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        FloatingActionButton(
-          onPressed:
-              () => context.read<MapBloc>().add(const LocationRequested()),
-          child: const Icon(Icons.my_location),
-        ),
-        const SizedBox(height: 16),
-        FloatingActionButton(
-          onPressed: () {
-            final center = _mapController.camera.center;
-            context.read<MapBloc>().add(TracesRequested(center: center));
-          },
-          child: const Icon(Icons.search),
-        ),
-      ],
     );
   }
 }

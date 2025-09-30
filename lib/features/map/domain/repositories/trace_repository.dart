@@ -24,10 +24,6 @@ class TraceRepository {
       page,
     );
 
-    for (final trace in traces) {
-      await localTraces.store(trace);
-    }
-
     return TraceMapper.toEntities(traces);
   }
 

@@ -21,7 +21,8 @@ class TraceRemoteDataSource {
     if (response.statusCode == 200) {
       final document = XmlDocument.parse(response.body);
       final tracks = document.findAllElements('trk');
-      return tracks.map(TraceMapper.fromXml).toList();
+      final traces = tracks.map(TraceMapper.fromXml).toList();
+      return traces;
     } else {
       throw Exception('Failed to load traces: ${response.statusCode}');
     }

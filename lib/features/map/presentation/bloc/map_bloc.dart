@@ -11,9 +11,9 @@ const double kSearchHalfSideDegrees = 0.01425;
 
 @injectable
 class MapBloc extends Bloc<MapEvent, MapState> {
-  final getMapConfig = GetMapConfigUseCase();
-  final getCurrentLocation = GetCurrentLocationUseCase();
-  final getPublicGpsTraces = GetTracesUseCase();
+  final _getMapConfig = GetMapConfigUseCase();
+  final _getCurrentLocation = GetCurrentLocationUseCase();
+  final _getPublicGpsTraces = GetTracesUseCase();
 
   MapBloc() : super(const MapState()) {
     on<MapRequested>(_onMapLoading);
@@ -26,7 +26,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   Future<void> _onMapLoading(MapRequested event, Emitter<MapState> emit) async {
     emit(state.copyWith(isLoading: true));
     try {
-      final style = await getMapConfig.run();
+      final style = await _getMapConfig();
       emit(state.copyWith(style: style));
     } catch (e) {
       emit(state.copyWith(errorMessage: AppError('Failed to load style: $e')));
@@ -42,8 +42,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     emit(state.copyWith(isLoading: true));
 
     try {
-      final location = await getCurrentLocation.run();
-      emit(state.copyWith(currentLocation: location));
+      final location = await _getCurrentLocation();
+      emit(state.copyWith(currentLocation: location, showLocationMarker: true));
     } catch (e) {
       emit(
         state.copyWith(errorMessage: AppError('Failed to get location: $e')),
@@ -71,7 +71,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
       emit(state.copyWith(searchCenter: center));
 
-      final traces = await getPublicGpsTraces.run(left, bottom, right, top, 0);
+      final traces = await _getPublicGpsTraces(left, bottom, right, top, 0);
       emit(state.copyWith(traces: traces));
     } catch (e) {
       emit(state.copyWith(errorMessage: AppError('Failed to get traces: $e')));

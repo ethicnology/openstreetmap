@@ -8,5 +8,5 @@ class GetMapConfigUseCase {
 
   GetMapConfigUseCase();
 
-  Future<Style> run() async => await repository.getMapConfig();
+  Future<Style> call() async => await repository.getMapConfig();
 }

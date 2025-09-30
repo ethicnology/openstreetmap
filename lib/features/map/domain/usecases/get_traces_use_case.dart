@@ -3,9 +3,10 @@ import 'package:openstreetmap/features/map/domain/repositories/trace_repository.
 
 class GetTracesUseCase {
   final repository = TraceRepository();
+
   GetTracesUseCase();
 
-  Future<List<TraceEntity>> run(
+  Future<List<TraceEntity>> call(
     double left,
     double bottom,
     double right,
@@ -13,6 +14,7 @@ class GetTracesUseCase {
     int page,
   ) async {
     final traces = await repository.fetch(left, bottom, right, top, page);
+    await repository.store(traces);
     return traces;
   }
 }
