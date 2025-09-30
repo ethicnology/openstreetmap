@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:openstreetmap/features/map/presentation/bloc/map_cubit.dart';
+import 'package:openstreetmap/features/map/presentation/bloc/map_bloc.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_state.dart';
+import 'package:openstreetmap/features/map/presentation/bloc/map_event.dart';
 import 'package:openstreetmap/features/map/domain/entities/trace_entity.dart';
 import 'package:vector_map_tiles/vector_map_tiles.dart';
 
@@ -36,90 +37,63 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<MapCubit, MapState>(
+      body: BlocBuilder<MapBloc, MapState>(
         builder: (context, state) {
-          return state.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            loaded: (style) => _buildMap(style),
-            loadedWithLocation:
-                (
-                  style,
-                  currentLocation,
-                  traces,
-                  loadingGpsTraces,
-                  showLocationMarker,
-                  searchCenter,
-                ) => _buildMapWithLocation(
-                  style,
-                  currentLocation,
-                  traces,
-                  loadingGpsTraces,
-                  showLocationMarker,
-                  searchCenter,
-                ),
-            error: (message) => Center(child: Text(message)),
-            initial: () => const SizedBox(),
-          );
+          if (state.errorMessage != null) {
+            return Center(child: Text(state.errorMessage!.message));
+          }
+
+          if (state.isLoading && state.style == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state.style == null) {
+            return const Center(child: Text('Loading map...'));
+          }
+
+          return _buildMap(state);
         },
       ),
       floatingActionButton: _buildFloatingActionButtons(),
     );
   }
 
-  Widget _buildMap(Style style) {
-    return Container(
-      color: Colors.grey[300],
-      child: FlutterMap(
-        mapController: _mapController,
-        options: const MapOptions(
-          initialCenter: LatLng(48.8566, 2.3522),
-          initialZoom: 13.0,
-        ),
-        children: [
-          VectorTileLayer(
-            maximumZoom: 19,
-            theme: style.theme,
-            tileProviders: style.providers,
-            sprites: style.sprites,
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildMap(MapState state) {
+    final location =
+        state.currentLocation ??
+        state.searchCenter ??
+        const LatLng(48.8566, 2.3522);
 
-  Widget _buildMapWithLocation(
-    Style style,
-    LatLng currentLocation,
-    List<TraceEntity> traces,
-    bool loadingGpsTraces,
-    bool showLocationMarker,
-    LatLng? searchCenter,
-  ) {
+    final zoom =
+        (state.currentLocation != null || state.searchCenter != null)
+            ? 15.0
+            : 13.0;
+
     return Stack(
       children: [
         Container(
           color: Colors.grey[300],
           child: FlutterMap(
             mapController: _mapController,
-            options: MapOptions(
-              initialCenter: currentLocation,
-              initialZoom: 15.0,
-            ),
+            options: MapOptions(initialCenter: location, initialZoom: zoom),
             children: [
               VectorTileLayer(
                 maximumZoom: 19,
-                theme: style.theme,
-                tileProviders: style.providers,
-                sprites: style.sprites,
+                theme: state.style!.theme,
+                tileProviders: state.style!.providers,
+                sprites: state.style!.sprites,
               ),
-              if (traces.isNotEmpty) _buildTracesLayer(traces),
-              if (showLocationMarker) _buildLocationMarker(currentLocation),
-              if (searchCenter != null) _buildSearchMarker(searchCenter),
-              _buildSquareOverlay(),
+              if (state.traces.isNotEmpty) _buildTracesLayer(state.traces),
+              if (state.showLocationMarker && state.currentLocation != null)
+                _buildLocationMarker(state.currentLocation!),
+              if (state.searchCenter != null)
+                _buildSearchMarker(state.searchCenter!),
+              if (state.currentLocation != null || state.searchCenter != null)
+                _buildSquareOverlay(),
             ],
           ),
         ),
-        if (loadingGpsTraces) const Center(child: CircularProgressIndicator()),
+        if (state.isLoading) const Center(child: CircularProgressIndicator()),
       ],
     );
   }
@@ -255,6 +229,7 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   ({double north, double south, double east, double west}) _calculateBounds(
     LatLng center,
   ) {
+    const double kSearchHalfSideDegrees = 0.01425;
     return (
       north: center.latitude + kSearchHalfSideDegrees,
       south: center.latitude - kSearchHalfSideDegrees,
@@ -268,14 +243,15 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         FloatingActionButton(
-          onPressed: () => context.read<MapCubit>().locateMe(),
+          onPressed:
+              () => context.read<MapBloc>().add(const LocationRequested()),
           child: const Icon(Icons.my_location),
         ),
         const SizedBox(height: 16),
         FloatingActionButton(
           onPressed: () {
             final center = _mapController.camera.center;
-            context.read<MapCubit>().searchTracesAt(center);
+            context.read<MapBloc>().add(TracesRequested(center: center));
           },
           child: const Icon(Icons.search),
         ),

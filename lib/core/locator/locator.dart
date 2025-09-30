@@ -9,7 +9,7 @@ import 'package:openstreetmap/features/map/domain/repositories/map_repository.da
 import 'package:openstreetmap/features/map/domain/usecases/get_current_location_use_case.dart';
 import 'package:openstreetmap/features/map/domain/usecases/get_map_tile_url_use_case.dart';
 import 'package:openstreetmap/features/map/domain/usecases/get_traces_use_case.dart';
-import 'package:openstreetmap/features/map/presentation/bloc/map_cubit.dart';
+import 'package:openstreetmap/features/map/presentation/bloc/map_bloc.dart';
 import 'package:openstreetmap/core/database/local_database.dart';
 
 final getIt = GetIt.instance;
@@ -17,7 +17,7 @@ final getIt = GetIt.instance;
 void setupLocator() {
   getIt.registerLazySingleton<LocalDatabase>(() => LocalDatabase());
 
-  getIt.registerFactory<MapCubit>(() => MapCubit());
+  getIt.registerFactory<MapBloc>(() => MapBloc());
   getIt.registerLazySingleton<GetMapConfigUseCase>(() => GetMapConfigUseCase());
   getIt.registerLazySingleton<GetCurrentLocationUseCase>(
     () => GetCurrentLocationUseCase(),

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:openstreetmap/features/map/presentation/bloc/map_bloc.dart';
+import 'package:openstreetmap/features/map/presentation/bloc/map_event.dart';
 import 'core/locator/locator.dart';
-import 'features/map/presentation/bloc/map_cubit.dart';
 import 'features/map/presentation/pages/map_page.dart';
 
 void main() async {
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<MapCubit>()..loadMap(),
+      create: (context) => getIt<MapBloc>()..add(const MapRequested()),
       child: MaterialApp(
         title: 'Map App',
         theme: ThemeData.dark(),
