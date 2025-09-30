@@ -22,30 +22,27 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     final bloc = context.read<MapBloc>();
 
-    return Scaffold(
-      body: BlocBuilder<MapBloc, MapState>(
-        builder: (context, state) {
-          final location =
-              state.currentLocation ??
-              state.searchCenter ??
-              const LatLng(48.8566, 2.3522);
+    return BlocBuilder<MapBloc, MapState>(
+      builder: (context, state) {
+        final location =
+            state.userLocation ??
+            state.searchCenter ??
+            const LatLng(48.8566, 2.3522);
 
-          final zoom =
-              (state.currentLocation != null || state.searchCenter != null)
-                  ? 15.0
-                  : 13.0;
+        final zoom =
+            (state.userLocation != null || state.searchCenter != null)
+                ? 16.0
+                : 12.0;
 
-          if (state.errorMessage != null) {
-            return Center(child: Text(state.errorMessage!.message));
-          }
-          if (state.style == null) {
-            return const Center(child: Text('Loading map...'));
-          }
-          if (state.isLoading && state.style == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
+        if (state.errorMessage != null) {
+          return Center(child: Text(state.errorMessage!.message));
+        }
+        if (state.isLoading && state.style == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          return Stack(
+        return Scaffold(
+          body: Stack(
             children: [
               Container(
                 color: Colors.grey[300],
@@ -64,9 +61,8 @@ class _MapPageState extends State<MapPage> {
                     ),
                     if (state.traces.isNotEmpty)
                       _buildTracesLayer(state.traces),
-                    if (state.showLocationMarker &&
-                        state.currentLocation != null)
-                      _buildLocationMarker(state.currentLocation!),
+                    if (state.userLocation != null)
+                      _buildLocationMarker(state.userLocation!),
                     if (state.searchCenter != null && state.isLoading)
                       _buildSquareOverlay(),
                   ],
@@ -75,26 +71,32 @@ class _MapPageState extends State<MapPage> {
               if (state.isLoading)
                 const Center(child: CircularProgressIndicator()),
             ],
-          );
-        },
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () => bloc.add(const LocationRequested()),
-            child: const Icon(Icons.my_location),
           ),
-          const SizedBox(height: 16),
-          FloatingActionButton(
-            onPressed: () {
-              final center = _mapController.camera.center;
-              bloc.add(TracesRequested(center: center));
-            },
-            child: const Icon(Icons.search),
+          floatingActionButton: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FloatingActionButton(
+                onPressed: () {
+                  bloc.add(const LocationRequested());
+                  Future.delayed(Duration(seconds: 1), () {
+                    if (state.userLocation == null) return;
+                    _mapController.move(state.userLocation!, zoom);
+                  });
+                },
+                child: const Icon(Icons.my_location),
+              ),
+              const SizedBox(height: 16),
+              FloatingActionButton(
+                onPressed: () {
+                  final center = _mapController.camera.center;
+                  bloc.add(TracesRequested(center: center));
+                },
+                child: const Icon(Icons.search),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

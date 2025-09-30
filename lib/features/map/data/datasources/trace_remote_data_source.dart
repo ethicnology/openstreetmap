@@ -16,8 +16,6 @@ class TraceRemoteDataSource {
     );
     final response = await http.get(uri);
 
-    print(uri.toString());
-
     if (response.statusCode == 200) {
       final document = XmlDocument.parse(response.body);
       final tracks = document.findAllElements('trk');

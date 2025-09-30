@@ -9,20 +9,18 @@ part 'map_state.mapper.dart';
 @MappableClass()
 class MapState with MapStateMappable {
   final Style? style;
-  final LatLng? currentLocation;
+  final LatLng? userLocation;
   final LatLng? searchCenter;
   final AppError? errorMessage;
   final List<TraceEntity> traces;
   final bool isLoading;
-  final bool showLocationMarker;
 
   const MapState({
     this.style,
-    this.currentLocation,
+    this.userLocation,
     this.searchCenter,
     this.errorMessage,
     this.traces = const [],
     this.isLoading = false,
-    this.showLocationMarker = false,
   });
 }

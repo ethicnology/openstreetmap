@@ -39,17 +39,13 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     LocationRequested event,
     Emitter<MapState> emit,
   ) async {
-    emit(state.copyWith(isLoading: true));
-
     try {
-      final location = await _getCurrentLocation();
-      emit(state.copyWith(currentLocation: location, showLocationMarker: true));
+      final userLocation = await _getCurrentLocation();
+      emit(state.copyWith(userLocation: userLocation));
     } catch (e) {
       emit(
         state.copyWith(errorMessage: AppError('Failed to get location: $e')),
       );
-    } finally {
-      emit(state.copyWith(isLoading: false));
     }
   }
 
@@ -58,8 +54,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     Emitter<MapState> emit,
   ) async {
     try {
-      emit(state.copyWith(isLoading: true));
-
       final center = event.center;
       final double lat = center.latitude;
       final double lon = center.longitude;
@@ -69,8 +63,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       final double bottom = lat - halfBox;
       final double top = lat + halfBox;
 
-      emit(state.copyWith(searchCenter: center));
-
+      emit(state.copyWith(searchCenter: center, isLoading: true));
       final traces = await _getPublicGpsTraces(left, bottom, right, top, 0);
       emit(state.copyWith(traces: traces));
     } catch (e) {
