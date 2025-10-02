@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:openstreetmap/features/map/domain/entities/activity_entity.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_bloc.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_state.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_event.dart';
@@ -37,7 +39,7 @@ class _MapPageState extends State<MapPage> {
         if (state.errorMessage != null) {
           return Center(child: Text(state.errorMessage!.message));
         }
-        if (state.isLoading && state.style == null) {
+        if (state.style == null) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -70,6 +72,8 @@ class _MapPageState extends State<MapPage> {
               ),
               if (state.isLoading)
                 const Center(child: CircularProgressIndicator()),
+              if (state.activity != null)
+                _buildActivityStatusWidget(state.activity!),
             ],
           ),
           floatingActionButton: Column(
@@ -77,7 +81,7 @@ class _MapPageState extends State<MapPage> {
             children: [
               FloatingActionButton(
                 onPressed: () {
-                  bloc.add(const LocationRequested());
+                  bloc.add(const FetchLocation());
                   Future.delayed(Duration(seconds: 1), () {
                     if (state.userLocation == null) return;
                     _mapController.move(state.userLocation!, zoom);
@@ -89,10 +93,39 @@ class _MapPageState extends State<MapPage> {
               FloatingActionButton(
                 onPressed: () {
                   final center = _mapController.camera.center;
-                  bloc.add(TracesRequested(center: center));
+                  bloc.add(FetchTraces(center: center));
                 },
                 child: const Icon(Icons.search),
               ),
+
+              if (state.isPaused) ...[
+                const SizedBox(height: 16),
+                FloatingActionButton(
+                  onPressed: () => bloc.add(const StopActivity()),
+                  child: const Icon(Icons.stop),
+                ),
+              ],
+
+              if (state.activity != null) ...[
+                const SizedBox(height: 16),
+                FloatingActionButton(
+                  onPressed: () => bloc.add(const PauseActivity()),
+                  child:
+                      state.isPaused
+                          ? const Icon(Icons.play_arrow)
+                          : const Icon(Icons.pause),
+                ),
+              ],
+
+              if (state.activity == null) ...[
+                const SizedBox(height: 16),
+                FloatingActionButton(
+                  onPressed: () {
+                    bloc.add(const StartActivity());
+                  },
+                  child: const Icon(Icons.play_arrow),
+                ),
+              ],
             ],
           ),
         );
@@ -199,5 +232,85 @@ class _MapPageState extends State<MapPage> {
       east: center.longitude + kSearchHalfSideDegrees,
       west: center.longitude - kSearchHalfSideDegrees,
     );
+  }
+
+  Widget _buildActivityStatusWidget(ActivityEntity activity) {
+    return BlocBuilder<MapBloc, MapState>(
+      builder: (context, state) {
+        return Positioned(
+          top: 50,
+          left: 16,
+          right: 16,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.black87,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.red.withAlpha(128),
+                        blurRadius: 4,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Recording Activity',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${activity.points.length} points • ${_formatDuration(state.elapsedTime)}',
+                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+
+    if (hours > 0) {
+      return '${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}';
+    } else {
+      return '${twoDigits(minutes)}:${twoDigits(seconds)}';
+    }
   }
 }

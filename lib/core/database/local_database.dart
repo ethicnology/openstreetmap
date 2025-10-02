@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:openstreetmap/core/database/tables/activities_table.dart';
+import 'package:openstreetmap/core/database/tables/activity_points_table.dart';
 import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -8,7 +10,9 @@ import 'tables/trace_points_table.dart';
 
 part 'local_database.g.dart';
 
-@DriftDatabase(tables: [TraceMetadatas, TracePoints])
+@DriftDatabase(
+  tables: [TraceMetadatas, TracePoints, Activities, ActivityPoints],
+)
 class LocalDatabase extends _$LocalDatabase {
   LocalDatabase() : super(_openConnection());
 

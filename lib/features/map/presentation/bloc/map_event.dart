@@ -4,16 +4,32 @@ sealed class MapEvent {
   const MapEvent();
 }
 
-class MapRequested extends MapEvent {
-  const MapRequested();
+class FetchMap extends MapEvent {
+  const FetchMap();
 }
 
-class LocationRequested extends MapEvent {
-  const LocationRequested();
+class FetchLocation extends MapEvent {
+  const FetchLocation();
 }
 
-class TracesRequested extends MapEvent {
-  const TracesRequested({required this.center});
+class StartActivity extends MapEvent {
+  const StartActivity();
+}
+
+class StopActivity extends MapEvent {
+  const StopActivity();
+}
+
+class AlterActivity extends MapEvent {
+  const AlterActivity();
+}
+
+class PauseActivity extends MapEvent {
+  const PauseActivity();
+}
+
+class FetchTraces extends MapEvent {
+  const FetchTraces({required this.center});
 
   final LatLng center;
 }

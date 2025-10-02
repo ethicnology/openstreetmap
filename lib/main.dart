@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<MapBloc>()..add(const MapRequested()),
+      create: (context) => getIt<MapBloc>()..add(const FetchMap()),
       child: MaterialApp(
         title: 'Map App',
         theme: ThemeData.dark(),

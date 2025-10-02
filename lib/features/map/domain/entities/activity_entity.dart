@@ -1,30 +1,30 @@
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'trace_entity.mapper.dart';
+part 'activity_entity.mapper.dart';
 
 @MappableClass()
-class TraceEntity with TraceEntityMappable {
+class ActivityEntity with ActivityEntityMappable {
+  final String id;
   final String name;
   final String description;
-  final String url;
-  final List<TracePointEntity> points;
+  final List<ActivityPointEntity> points;
 
-  TraceEntity({
+  ActivityEntity({
+    required this.id,
     required this.name,
     required this.description,
-    required this.url,
     required this.points,
   });
 }
 
 @MappableClass()
-class TracePointEntity with TracePointEntityMappable {
+class ActivityPointEntity with ActivityPointEntityMappable {
   final double latitude;
   final double longitude;
   final double? elevation;
-  final DateTime? time;
+  final DateTime time;
 
-  TracePointEntity({
+  ActivityPointEntity({
     required this.latitude,
     required this.longitude,
     required this.elevation,

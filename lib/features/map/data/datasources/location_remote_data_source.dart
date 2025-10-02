@@ -1,8 +1,6 @@
-import 'package:injectable/injectable.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
-@LazySingleton()
 class LocationRemoteDataSource {
   Future<LatLng> getCurrentLocation() async {
     final position = await Geolocator.getCurrentPosition();

@@ -1,29 +1,44 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:injectable/injectable.dart';
 import 'package:openstreetmap/core/errors.dart';
+import 'package:openstreetmap/features/map/domain/entities/activity_entity.dart';
+import 'package:openstreetmap/features/map/domain/usecases/alter_activity_use_case.dart';
+import 'package:openstreetmap/features/map/domain/usecases/begin_activity_use_case.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_event.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_state.dart';
-import 'package:openstreetmap/features/map/domain/usecases/get_current_location_use_case.dart';
+import 'package:openstreetmap/features/map/domain/usecases/get_user_location_use_case.dart';
 import 'package:openstreetmap/features/map/domain/usecases/get_map_tile_url_use_case.dart';
 import 'package:openstreetmap/features/map/domain/usecases/get_traces_use_case.dart';
+import 'package:openstreetmap/features/map/presentation/error.dart';
 
 const double kSearchHalfSideDegrees = 0.01425;
 
-@injectable
 class MapBloc extends Bloc<MapEvent, MapState> {
   final _getMapConfig = GetMapConfigUseCase();
-  final _getCurrentLocation = GetCurrentLocationUseCase();
+  final _getUserLocation = GetUserLocationUseCase();
   final _getPublicGpsTraces = GetTracesUseCase();
+  final _beginActivity = BeginActivityUseCase();
+  final _alterActivity = AlterActivityUseCase();
 
   MapBloc() : super(const MapState()) {
-    on<MapRequested>(_onMapLoading);
-    on<LocationRequested>(_onLocationRequested);
-    on<TracesRequested>(_onTracesSearchRequested);
+    on<FetchMap>(_onMapLoading);
+    on<FetchLocation>(_onLocationRequested);
+    on<FetchTraces>(_onTracesSearchRequested);
+    on<StartActivity>(_onStartActivity);
+    on<StopActivity>(_onStopActivity);
+    on<AlterActivity>(_onAlterActivity);
+    on<PauseActivity>(_onPauseActivity);
 
-    add(const MapRequested());
+    add(const FetchMap());
   }
 
-  Future<void> _onMapLoading(MapRequested event, Emitter<MapState> emit) async {
+  @override
+  Future<void> close() {
+    state.activityTimer?.cancel();
+    return super.close();
+  }
+
+  Future<void> _onMapLoading(FetchMap event, Emitter<MapState> emit) async {
     emit(state.copyWith(isLoading: true));
     try {
       final style = await _getMapConfig();
@@ -36,11 +51,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   }
 
   Future<void> _onLocationRequested(
-    LocationRequested event,
+    FetchLocation event,
     Emitter<MapState> emit,
   ) async {
     try {
-      final userLocation = await _getCurrentLocation();
+      final userLocation = await _getUserLocation();
       emit(state.copyWith(userLocation: userLocation));
     } catch (e) {
       emit(
@@ -50,7 +65,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   }
 
   Future<void> _onTracesSearchRequested(
-    TracesRequested event,
+    FetchTraces event,
     Emitter<MapState> emit,
   ) async {
     try {
@@ -70,6 +85,83 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       emit(state.copyWith(errorMessage: AppError('Failed to get traces: $e')));
     } finally {
       emit(state.copyWith(isLoading: false));
+    }
+  }
+
+  Future<void> _onStartActivity(
+    StartActivity event,
+    Emitter<MapState> emit,
+  ) async {
+    state.activityTimer?.cancel();
+
+    final activity = await _beginActivity();
+
+    final activityTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      add(const AlterActivity());
+    });
+
+    emit(state.copyWith(activity: activity, activityTimer: activityTimer));
+  }
+
+  void _onStopActivity(StopActivity event, Emitter<MapState> emit) {
+    state.activityTimer?.cancel();
+    emit(
+      state.copyWith(
+        activityTimer: null,
+        activity: null,
+        elapsedTime: Duration.zero,
+      ),
+    );
+  }
+
+  void _onPauseActivity(PauseActivity event, Emitter<MapState> emit) {
+    if (state.activityTimer == null) throw ActivityNotStartedError();
+
+    final isTimerActive = state.activityTimer!.isActive;
+
+    if (isTimerActive) {
+      state.activityTimer?.cancel();
+      emit(state.copyWith(isPaused: true));
+    } else {
+      final activityTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        add(const AlterActivity());
+      });
+      emit(state.copyWith(activityTimer: activityTimer, isPaused: false));
+    }
+  }
+
+  Future<void> _onAlterActivity(
+    AlterActivity event,
+    Emitter<MapState> emit,
+  ) async {
+    if (state.activity == null) throw ActivityNotStartedError();
+
+    final now = DateTime.now().toUtc();
+
+    try {
+      final userLocation = await _getUserLocation();
+      final newPoint = ActivityPointEntity(
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+        elevation: null,
+        time: now,
+      );
+
+      await _alterActivity(activityId: state.activity!.id, point: newPoint);
+
+      final updatedPoints = [...state.activity!.points, newPoint];
+
+      final firstPointTime = DateTime.parse(state.activity!.id);
+      final elapsedTime = now.difference(firstPointTime);
+
+      emit(
+        state.copyWith(
+          activity: state.activity?.copyWith(points: updatedPoints),
+          elapsedTime: elapsedTime,
+        ),
+      );
+    } catch (e) {
+      print('Error updating track activity: $e');
     }
   }
 }

@@ -1,8 +1,6 @@
-import 'package:injectable/injectable.dart';
 import 'package:latlong2/latlong.dart';
 import '../../data/datasources/location_remote_data_source.dart';
 
-@LazySingleton()
 class LocationRepository {
   final remoteDataSource = LocationRemoteDataSource();
 
