@@ -21,7 +21,7 @@ class ActivityEntity with ActivityEntityMappable {
 class ActivityPointEntity with ActivityPointEntityMappable {
   final double latitude;
   final double longitude;
-  final double? elevation;
+  final double elevation;
   final DateTime time;
 
   ActivityPointEntity({

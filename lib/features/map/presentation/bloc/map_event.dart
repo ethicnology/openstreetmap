@@ -33,3 +33,7 @@ class FetchTraces extends MapEvent {
 
   final LatLng center;
 }
+
+class ClearError extends MapEvent {
+  const ClearError();
+}

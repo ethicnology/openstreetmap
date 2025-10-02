@@ -1,10 +1,9 @@
 import 'package:geolocator/geolocator.dart';
-import 'package:latlong2/latlong.dart';
 
 class LocationRemoteDataSource {
-  Future<LatLng> getCurrentLocation() async {
+  Future<Position> getCurrentLocation() async {
     final position = await Geolocator.getCurrentPosition();
-    return LatLng(position.latitude, position.longitude);
+    return position;
   }
 
   Future<bool> requestLocationPermission() async {

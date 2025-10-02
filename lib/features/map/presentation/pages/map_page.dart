@@ -2,8 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:latlong2/latlong.dart' show LatLng;
 import 'package:openstreetmap/features/map/domain/entities/activity_entity.dart';
+import 'package:openstreetmap/features/map/domain/entities/position_entity.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_bloc.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_state.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_event.dart';
@@ -24,112 +25,145 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     final bloc = context.read<MapBloc>();
 
-    return BlocBuilder<MapBloc, MapState>(
-      builder: (context, state) {
-        final location =
-            state.userLocation ??
-            state.searchCenter ??
-            const LatLng(48.8566, 2.3522);
-
-        final zoom =
-            (state.userLocation != null || state.searchCenter != null)
-                ? 16.0
-                : 12.0;
-
+    return BlocListener<MapBloc, MapState>(
+      listener: (context, state) {
         if (state.errorMessage != null) {
-          return Center(child: Text(state.errorMessage!.message));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                state.errorMessage!.message,
+                style: TextStyle(color: Colors.white, fontSize: 14),
+              ),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+          context.read<MapBloc>().add(const ClearError());
         }
-        if (state.style == null) {
-          return const Center(child: CircularProgressIndicator());
-        }
+      },
+      child: BlocBuilder<MapBloc, MapState>(
+        builder: (context, state) {
+          final location =
+              state.userLocation ??
+              state.searchCenter ??
+              PositionEntity(
+                latitude: 48.8566,
+                longitude: 2.3522,
+                elevation: 0,
+              );
 
-        return Scaffold(
-          body: Stack(
-            children: [
-              Container(
-                color: Colors.grey[300],
-                child: FlutterMap(
-                  mapController: _mapController,
-                  options: MapOptions(
-                    initialCenter: location,
-                    initialZoom: zoom,
-                  ),
-                  children: [
-                    VectorTileLayer(
-                      maximumZoom: 19,
-                      theme: state.style!.theme,
-                      tileProviders: state.style!.providers,
-                      sprites: state.style!.sprites,
+          final zoom =
+              (state.userLocation != null || state.searchCenter != null)
+                  ? 16.0
+                  : 12.0;
+
+          if (state.style == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return Scaffold(
+            body: Stack(
+              children: [
+                Container(
+                  color: Colors.grey[300],
+                  child: FlutterMap(
+                    mapController: _mapController,
+                    options: MapOptions(
+                      initialCenter: LatLng(
+                        location.latitude,
+                        location.longitude,
+                      ),
+                      initialZoom: zoom,
                     ),
-                    if (state.traces.isNotEmpty)
-                      _buildTracesLayer(state.traces),
-                    if (state.userLocation != null)
-                      _buildLocationMarker(state.userLocation!),
-                    if (state.searchCenter != null && state.isLoading)
-                      _buildSquareOverlay(),
-                  ],
+                    children: [
+                      VectorTileLayer(
+                        maximumZoom: 19,
+                        theme: state.style!.theme,
+                        tileProviders: state.style!.providers,
+                        sprites: state.style!.sprites,
+                      ),
+                      if (state.traces.isNotEmpty)
+                        _buildTracesLayer(state.traces),
+                      if (state.userLocation != null)
+                        _buildLocationMarker(
+                          PositionEntity(
+                            latitude: state.userLocation!.latitude,
+                            longitude: state.userLocation!.longitude,
+                            elevation: state.userLocation!.elevation,
+                          ),
+                        ),
+                      if (state.searchCenter != null && state.isLoading)
+                        _buildSquareOverlay(),
+                    ],
+                  ),
                 ),
-              ),
-              if (state.isLoading)
-                const Center(child: CircularProgressIndicator()),
-              if (state.activity != null)
-                _buildActivityStatusWidget(state.activity!),
-            ],
-          ),
-          floatingActionButton: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              FloatingActionButton(
-                onPressed: () {
-                  bloc.add(const FetchLocation());
-                  Future.delayed(Duration(seconds: 1), () {
-                    if (state.userLocation == null) return;
-                    _mapController.move(state.userLocation!, zoom);
-                  });
-                },
-                child: const Icon(Icons.my_location),
-              ),
-              const SizedBox(height: 16),
-              FloatingActionButton(
-                onPressed: () {
-                  final center = _mapController.camera.center;
-                  bloc.add(FetchTraces(center: center));
-                },
-                child: const Icon(Icons.search),
-              ),
-
-              if (state.isPaused) ...[
-                const SizedBox(height: 16),
-                FloatingActionButton(
-                  onPressed: () => bloc.add(const StopActivity()),
-                  child: const Icon(Icons.stop),
-                ),
+                if (state.isLoading)
+                  const Center(child: CircularProgressIndicator()),
+                if (state.activity != null)
+                  _buildActivityStatusWidget(state.activity!),
               ],
-
-              if (state.activity != null) ...[
-                const SizedBox(height: 16),
+            ),
+            floatingActionButton: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
                 FloatingActionButton(
-                  onPressed: () => bloc.add(const PauseActivity()),
-                  child:
-                      state.isPaused
-                          ? const Icon(Icons.play_arrow)
-                          : const Icon(Icons.pause),
+                  onPressed: () {
+                    bloc.add(const FetchLocation());
+                    Future.delayed(Duration(seconds: 1), () {
+                      if (state.userLocation == null) return;
+                      _mapController.move(
+                        LatLng(
+                          state.userLocation!.latitude,
+                          state.userLocation!.longitude,
+                        ),
+                        zoom,
+                      );
+                    });
+                  },
+                  child: const Icon(Icons.my_location),
                 ),
-              ],
-
-              if (state.activity == null) ...[
                 const SizedBox(height: 16),
                 FloatingActionButton(
                   onPressed: () {
-                    bloc.add(const StartActivity());
+                    final center = _mapController.camera.center;
+                    bloc.add(FetchTraces(center: center));
                   },
-                  child: const Icon(Icons.play_arrow),
+                  child: const Icon(Icons.search),
                 ),
+
+                if (state.isPaused) ...[
+                  const SizedBox(height: 16),
+                  FloatingActionButton(
+                    onPressed: () => bloc.add(const StopActivity()),
+                    child: const Icon(Icons.stop),
+                  ),
+                ],
+
+                if (state.activity != null) ...[
+                  const SizedBox(height: 16),
+                  FloatingActionButton(
+                    onPressed: () => bloc.add(const PauseActivity()),
+                    child:
+                        state.isPaused
+                            ? const Icon(Icons.play_arrow)
+                            : const Icon(Icons.pause),
+                  ),
+                ],
+
+                if (state.activity == null) ...[
+                  const SizedBox(height: 16),
+                  FloatingActionButton(
+                    onPressed: () {
+                      bloc.add(const StartActivity());
+                    },
+                    child: const Icon(Icons.play_arrow),
+                  ),
+                ],
               ],
-            ],
-          ),
-        );
-      },
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -188,11 +222,11 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget _buildLocationMarker(LatLng location) {
+  Widget _buildLocationMarker(PositionEntity location) {
     return MarkerLayer(
       markers: [
         Marker(
-          point: location,
+          point: LatLng(location.latitude, location.longitude),
           width: 40,
           height: 40,
           child: const Icon(Icons.my_location, color: Colors.white, size: 24),

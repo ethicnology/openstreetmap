@@ -6,7 +6,7 @@ class ActivityPoints extends Table {
   IntColumn get id => integer().autoIncrement()();
   RealColumn get latitude => real()();
   RealColumn get longitude => real()();
-  RealColumn get elevation => real().nullable()();
+  RealColumn get elevation => real()();
   DateTimeColumn get time => dateTime()();
   TextColumn get activityId => text().references(Activities, #id)();
 }

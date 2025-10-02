@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:openstreetmap/core/errors.dart';
 import 'package:openstreetmap/features/map/domain/entities/activity_entity.dart';
+import 'package:openstreetmap/features/map/domain/entities/position_entity.dart';
 import 'package:openstreetmap/features/map/domain/usecases/alter_activity_use_case.dart';
 import 'package:openstreetmap/features/map/domain/usecases/begin_activity_use_case.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_event.dart';
@@ -28,6 +29,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<StopActivity>(_onStopActivity);
     on<AlterActivity>(_onAlterActivity);
     on<PauseActivity>(_onPauseActivity);
+    on<ClearError>(_onClearError);
 
     add(const FetchMap());
   }
@@ -44,7 +46,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       final style = await _getMapConfig();
       emit(state.copyWith(style: style));
     } catch (e) {
-      emit(state.copyWith(errorMessage: AppError('Failed to load style: $e')));
+      emit(state.copyWith(errorMessage: AppError(e.toString())));
     } finally {
       emit(state.copyWith(isLoading: false));
     }
@@ -58,9 +60,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       final userLocation = await _getUserLocation();
       emit(state.copyWith(userLocation: userLocation));
     } catch (e) {
-      emit(
-        state.copyWith(errorMessage: AppError('Failed to get location: $e')),
-      );
+      emit(state.copyWith(errorMessage: AppError(e.toString())));
     }
   }
 
@@ -78,11 +78,20 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       final double bottom = lat - halfBox;
       final double top = lat + halfBox;
 
-      emit(state.copyWith(searchCenter: center, isLoading: true));
+      emit(
+        state.copyWith(
+          searchCenter: PositionEntity(
+            latitude: lat,
+            longitude: lon,
+            elevation: 0,
+          ),
+          isLoading: true,
+        ),
+      );
       final traces = await _getPublicGpsTraces(left, bottom, right, top, 0);
       emit(state.copyWith(traces: traces));
     } catch (e) {
-      emit(state.copyWith(errorMessage: AppError('Failed to get traces: $e')));
+      emit(state.copyWith(errorMessage: AppError(e.toString())));
     } finally {
       emit(state.copyWith(isLoading: false));
     }
@@ -143,7 +152,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       final newPoint = ActivityPointEntity(
         latitude: userLocation.latitude,
         longitude: userLocation.longitude,
-        elevation: null,
+        elevation: userLocation.elevation,
         time: now,
       );
 
@@ -163,5 +172,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     } catch (e) {
       print('Error updating track activity: $e');
     }
+  }
+
+  void _onClearError(ClearError event, Emitter<MapState> emit) {
+    emit(state.copyWith(errorMessage: null));
   }
 }
