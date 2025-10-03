@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:openstreetmap/core/errors.dart';
 import 'package:openstreetmap/features/map/domain/entities/position_entity.dart';
-import 'package:openstreetmap/features/map/domain/usecases/alter_activity_use_case.dart';
+import 'package:openstreetmap/features/map/domain/usecases/score_activity_use_case.dart';
 import 'package:openstreetmap/features/map/domain/usecases/begin_activity_use_case.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_event.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_state.dart';
@@ -14,19 +14,19 @@ import 'package:openstreetmap/features/map/presentation/error.dart';
 const double kSearchHalfSideDegrees = 0.01425;
 
 class MapBloc extends Bloc<MapEvent, MapState> {
-  final _getMapConfig = GetMapConfigUseCase();
-  final _getUserLocation = GetUserLocationUseCase();
-  final _getPublicGpsTraces = GetTracesUseCase();
-  final _beginActivity = BeginActivityUseCase();
-  final _alterActivity = AlterActivityUseCase();
+  final _getMapConfigUseCase = GetMapConfigUseCase();
+  final _getUserLocationUseCase = GetUserLocationUseCase();
+  final _getPublicGpsTracesUseCase = GetTracesUseCase();
+  final _beginActivityUseCase = BeginActivityUseCase();
+  final _pointActivityUseCase = ScoreActivityUseCase();
 
   MapBloc() : super(const MapState()) {
     on<FetchMap>(_onMapLoading);
     on<FetchLocation>(_onLocationRequested);
     on<FetchTraces>(_onTracesSearchRequested);
-    on<StartActivity>(_onStartActivity);
-    on<StopActivity>(_onStopActivity);
-    on<AlterActivity>(_onAlterActivity);
+    on<BeginActivity>(_onBeginActivity);
+    on<CeaseActivity>(_onCeaseActivity);
+    on<ScoreActivity>(_onScoreActivity);
     on<PauseActivity>(_onPauseActivity);
     on<ClearError>(_onClearError);
 
@@ -42,7 +42,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   Future<void> _onMapLoading(FetchMap event, Emitter<MapState> emit) async {
     emit(state.copyWith(isLoading: true));
     try {
-      final style = await _getMapConfig();
+      final style = await _getMapConfigUseCase();
       emit(state.copyWith(style: style));
     } catch (e) {
       emit(state.copyWith(errorMessage: AppError(e.toString())));
@@ -56,7 +56,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     Emitter<MapState> emit,
   ) async {
     try {
-      final userLocation = await _getUserLocation();
+      final userLocation = await _getUserLocationUseCase();
       emit(state.copyWith(userLocation: userLocation));
     } catch (e) {
       emit(state.copyWith(errorMessage: AppError(e.toString())));
@@ -87,7 +87,13 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           isLoading: true,
         ),
       );
-      final traces = await _getPublicGpsTraces(left, bottom, right, top, 0);
+      final traces = await _getPublicGpsTracesUseCase(
+        left,
+        bottom,
+        right,
+        top,
+        0,
+      );
       emit(state.copyWith(traces: traces));
     } catch (e) {
       emit(state.copyWith(errorMessage: AppError(e.toString())));
@@ -96,22 +102,22 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }
   }
 
-  Future<void> _onStartActivity(
-    StartActivity event,
+  Future<void> _onBeginActivity(
+    BeginActivity event,
     Emitter<MapState> emit,
   ) async {
     state.activityTimer?.cancel();
 
-    final activity = await _beginActivity();
+    final activity = await _beginActivityUseCase();
 
     final activityTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      add(const AlterActivity());
+      add(const ScoreActivity());
     });
 
     emit(state.copyWith(activity: activity, activityTimer: activityTimer));
   }
 
-  void _onStopActivity(StopActivity event, Emitter<MapState> emit) {
+  void _onCeaseActivity(CeaseActivity event, Emitter<MapState> emit) {
     state.activityTimer?.cancel();
     emit(
       state.copyWith(
@@ -132,19 +138,21 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       emit(state.copyWith(isPaused: true));
     } else {
       final activityTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        add(const AlterActivity());
+        add(const ScoreActivity());
       });
       emit(state.copyWith(activityTimer: activityTimer, isPaused: false));
     }
   }
 
-  Future<void> _onAlterActivity(
-    AlterActivity event,
+  Future<void> _onScoreActivity(
+    ScoreActivity event,
     Emitter<MapState> emit,
   ) async {
     if (state.activity == null) throw ActivityNotStartedError();
 
-    final newPoint = await _alterActivity(activityId: state.activity!.id);
+    final newPoint = await _pointActivityUseCase(
+      activityId: state.activity!.id,
+    );
     final updatedPoints = [...state.activity!.points, newPoint];
 
     final firstPointTime = DateTime.parse(state.activity!.id);

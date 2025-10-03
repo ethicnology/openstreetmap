@@ -134,7 +134,7 @@ class _MapPageState extends State<MapPage> {
                 if (state.isPaused) ...[
                   const SizedBox(height: 16),
                   FloatingActionButton(
-                    onPressed: () => bloc.add(const StopActivity()),
+                    onPressed: () => bloc.add(const CeaseActivity()),
                     child: const Icon(Icons.stop),
                   ),
                 ],
@@ -154,7 +154,7 @@ class _MapPageState extends State<MapPage> {
                   const SizedBox(height: 16),
                   FloatingActionButton(
                     onPressed: () {
-                      bloc.add(const StartActivity());
+                      bloc.add(const BeginActivity());
                     },
                     child: const Icon(Icons.play_arrow),
                   ),

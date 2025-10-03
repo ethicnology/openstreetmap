@@ -12,16 +12,16 @@ class FetchLocation extends MapEvent {
   const FetchLocation();
 }
 
-class StartActivity extends MapEvent {
-  const StartActivity();
+class BeginActivity extends MapEvent {
+  const BeginActivity();
 }
 
-class StopActivity extends MapEvent {
-  const StopActivity();
+class CeaseActivity extends MapEvent {
+  const CeaseActivity();
 }
 
-class AlterActivity extends MapEvent {
-  const AlterActivity();
+class ScoreActivity extends MapEvent {
+  const ScoreActivity();
 }
 
 class PauseActivity extends MapEvent {
