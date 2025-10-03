@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:openstreetmap/core/errors.dart';
-import 'package:openstreetmap/features/map/domain/entities/activity_entity.dart';
 import 'package:openstreetmap/features/map/domain/entities/position_entity.dart';
 import 'package:openstreetmap/features/map/domain/usecases/alter_activity_use_case.dart';
 import 'package:openstreetmap/features/map/domain/usecases/begin_activity_use_case.dart';
@@ -145,33 +144,18 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   ) async {
     if (state.activity == null) throw ActivityNotStartedError();
 
-    final now = DateTime.now().toUtc();
+    final newPoint = await _alterActivity(activityId: state.activity!.id);
+    final updatedPoints = [...state.activity!.points, newPoint];
 
-    try {
-      final userLocation = await _getUserLocation();
-      final newPoint = ActivityPointEntity(
-        latitude: userLocation.latitude,
-        longitude: userLocation.longitude,
-        elevation: userLocation.elevation,
-        time: now,
-      );
+    final firstPointTime = DateTime.parse(state.activity!.id);
+    final elapsedTime = DateTime.now().difference(firstPointTime);
 
-      await _alterActivity(activityId: state.activity!.id, point: newPoint);
-
-      final updatedPoints = [...state.activity!.points, newPoint];
-
-      final firstPointTime = DateTime.parse(state.activity!.id);
-      final elapsedTime = now.difference(firstPointTime);
-
-      emit(
-        state.copyWith(
-          activity: state.activity?.copyWith(points: updatedPoints),
-          elapsedTime: elapsedTime,
-        ),
-      );
-    } catch (e) {
-      print('Error updating track activity: $e');
-    }
+    emit(
+      state.copyWith(
+        activity: state.activity?.copyWith(points: updatedPoints),
+        elapsedTime: elapsedTime,
+      ),
+    );
   }
 
   void _onClearError(ClearError event, Emitter<MapState> emit) {
