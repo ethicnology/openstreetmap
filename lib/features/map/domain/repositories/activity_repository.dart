@@ -17,11 +17,15 @@ class ActivityRepository {
     return models.map(ActivityModel.toEntity).toList();
   }
 
-  Future<void> storePoints(
+  Future<void> score(
     String activityId,
     List<ActivityPointEntity> points,
   ) async {
     final models = points.map(ActivityPointModel.fromEntity).toList();
-    await localActivities.storePoints(activityId, models);
+    await localActivities.score(activityId, models);
+  }
+
+  Future<void> cease(String activityId) async {
+    await localActivities.cease(activityId);
   }
 }

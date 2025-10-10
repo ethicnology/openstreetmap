@@ -1,7 +1,11 @@
+import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 import 'package:openstreetmap/core/errors.dart';
 
 class LocationRemoteDataSource {
+  StreamSubscription<Position>? _positionStreamSubscription;
+  StreamSubscription<ServiceStatus>? _serviceStatusStreamSubscription;
+
   Future<Position> getCurrentLocation() async {
     final hasPermission = await checkLocationPermission();
     if (!hasPermission) {
@@ -11,6 +15,20 @@ class LocationRemoteDataSource {
 
     final position = await Geolocator.getCurrentPosition();
     return position;
+  }
+
+  Stream<Position> getPositionStream() {
+    return Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 1,
+        // timeLimit: Duration(seconds: 10),
+      ),
+    );
+  }
+
+  Stream<ServiceStatus> getServiceStatusStream() {
+    return Geolocator.getServiceStatusStream();
   }
 
   Future<bool> requestLocationPermission() async {
@@ -23,6 +41,15 @@ class LocationRemoteDataSource {
     final permission = await Geolocator.checkPermission();
     return permission == LocationPermission.whileInUse ||
         permission == LocationPermission.always;
+  }
+
+  Future<bool> isLocationServiceEnabled() async {
+    return await Geolocator.isLocationServiceEnabled();
+  }
+
+  void dispose() {
+    _positionStreamSubscription?.cancel();
+    _serviceStatusStreamSubscription?.cancel();
   }
 }
 

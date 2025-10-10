@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
+import 'package:openstreetmap/core/global.dart';
 import 'package:openstreetmap/features/map/domain/entities/activity_entity.dart';
 import 'package:openstreetmap/features/map/domain/entities/position_entity.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_bloc.dart';
@@ -25,22 +26,37 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     final bloc = context.read<MapBloc>();
 
-    return BlocListener<MapBloc, MapState>(
-      listener: (context, state) {
-        if (state.errorMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state.errorMessage!.message,
-                style: TextStyle(color: Colors.white, fontSize: 14),
-              ),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 3),
-            ),
-          );
-          context.read<MapBloc>().add(const ClearError());
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<MapBloc, MapState>(
+          listener: (context, state) {
+            if (state.errorMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    state.errorMessage!.message,
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                  backgroundColor: Colors.red,
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+              context.read<MapBloc>().add(const ClearError());
+            }
+          },
+        ),
+        BlocListener<MapBloc, MapState>(
+          listenWhen:
+              (previous, current) =>
+                  (previous.activity == null || previous.points.isEmpty) &&
+                  current.activity != null &&
+                  current.points.isNotEmpty,
+          listener: (context, state) {
+            final firstPoint = state.points.first;
+            _mapController.move(firstPoint.position.toLatLng(), Global.maxZoom);
+          },
+        ),
+      ],
       child: BlocBuilder<MapBloc, MapState>(
         builder: (context, state) {
           final location =
@@ -51,11 +67,6 @@ class _MapPageState extends State<MapPage> {
                 longitude: 2.3522,
                 elevation: 0,
               );
-
-          final zoom =
-              (state.userLocation != null || state.searchCenter != null)
-                  ? 16.0
-                  : 12.0;
 
           if (state.style == null) {
             return const Center(child: CircularProgressIndicator());
@@ -69,21 +80,21 @@ class _MapPageState extends State<MapPage> {
                   child: FlutterMap(
                     mapController: _mapController,
                     options: MapOptions(
-                      initialCenter: LatLng(
-                        location.latitude,
-                        location.longitude,
-                      ),
-                      initialZoom: zoom,
+                      initialCenter: location.toLatLng(),
+                      initialZoom: Global.defaultZoom,
+                      maxZoom: Global.maxZoom,
                     ),
                     children: [
                       VectorTileLayer(
-                        maximumZoom: 19,
+                        maximumZoom: Global.maxZoom,
                         theme: state.style!.theme,
                         tileProviders: state.style!.providers,
                         sprites: state.style!.sprites,
                       ),
                       if (state.traces.isNotEmpty)
                         _buildTracesLayer(state.traces),
+                      if (state.activity != null && state.points.isNotEmpty)
+                        _buildActivityPath(state.points),
                       if (state.userLocation != null)
                         _buildLocationMarker(
                           PositionEntity(
@@ -99,8 +110,7 @@ class _MapPageState extends State<MapPage> {
                 ),
                 if (state.isLoading)
                   const Center(child: CircularProgressIndicator()),
-                if (state.activity != null)
-                  _buildActivityStatusWidget(state.activity!),
+                if (state.activity != null) _buildActivityStatusWidget(),
               ],
             ),
             floatingActionButton: Column(
@@ -116,7 +126,7 @@ class _MapPageState extends State<MapPage> {
                           state.userLocation!.latitude,
                           state.userLocation!.longitude,
                         ),
-                        zoom,
+                        15,
                       );
                     });
                   },
@@ -131,7 +141,7 @@ class _MapPageState extends State<MapPage> {
                   child: const Icon(Icons.search),
                 ),
 
-                if (state.isPaused) ...[
+                if (state.isPaused && state.activity != null) ...[
                   const SizedBox(height: 16),
                   FloatingActionButton(
                     onPressed: () => bloc.add(const CeaseActivity()),
@@ -154,7 +164,7 @@ class _MapPageState extends State<MapPage> {
                   const SizedBox(height: 16),
                   FloatingActionButton(
                     onPressed: () {
-                      bloc.add(const BeginActivity());
+                      bloc.add(const StartActivity());
                     },
                     child: const Icon(Icons.play_arrow),
                   ),
@@ -222,6 +232,47 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+  Widget _buildActivityPath(List<ActivityPointEntity> points) {
+    if (points.isEmpty) return PolylineLayer(polylines: <Polyline>[]);
+
+    final segments = <Polyline>[];
+    var segmentPoints = <ActivityPointEntity>[];
+    ActivityPointStatusEntity? previousStatus;
+
+    for (final point in points) {
+      final hasStatusChanged =
+          previousStatus != null && point.status != previousStatus;
+
+      if (hasStatusChanged) {
+        segments.add(_createPathSegment(segmentPoints, previousStatus));
+        segmentPoints = [];
+      }
+
+      segmentPoints.add(point);
+      previousStatus = point.status;
+    }
+
+    if (segmentPoints.isNotEmpty && previousStatus != null) {
+      segments.add(_createPathSegment(segmentPoints, previousStatus));
+    }
+
+    return PolylineLayer(polylines: segments);
+  }
+
+  Polyline _createPathSegment(
+    List<ActivityPointEntity> points,
+    ActivityPointStatusEntity status,
+  ) {
+    return Polyline(
+      points: points.map((p) => p.position.toLatLng()).toList(),
+      color:
+          status == ActivityPointStatusEntity.active
+              ? Colors.blue
+              : Colors.yellow,
+      strokeWidth: 4.0,
+    );
+  }
+
   Widget _buildLocationMarker(PositionEntity location) {
     return MarkerLayer(
       markers: [
@@ -268,7 +319,7 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget _buildActivityStatusWidget(ActivityEntity activity) {
+  Widget _buildActivityStatusWidget() {
     return BlocBuilder<MapBloc, MapState>(
       builder: (context, state) {
         return Positioned(
@@ -290,40 +341,87 @@ class _MapPageState extends State<MapPage> {
             ),
             child: Row(
               children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.red.withAlpha(128),
-                        blurRadius: 4,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        'Recording Activity',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Recording Activity',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          Text(
+                            _formatDuration(state.elapsedTime),
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
+
                       const SizedBox(height: 4),
-                      Text(
-                        '${activity.points.length} points • ${_formatDuration(state.elapsedTime)}',
-                        style: TextStyle(color: Colors.white70, fontSize: 12),
-                      ),
+
+                      if (state.statistics != null)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Active',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                Text(
+                                  'Duration: ${_formatDuration(state.statistics!.activityDuration)}',
+                                ),
+                                Text(
+                                  'Distance: ${state.statistics!.activeDistanceInKm.toStringAsFixed(2)} km',
+                                ),
+                                Text(
+                                  'Speed: ${state.statistics!.activeAverageSpeedKmh.toStringAsFixed(1)} km/h',
+                                ),
+                                Text(
+                                  'Elevation: +${state.statistics!.activeElevationGain.toStringAsFixed(0)}m / -${state.statistics!.activeElevationLoss.toStringAsFixed(0)}m',
+                                ),
+                              ],
+                            ),
+
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Paused',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                Text(
+                                  'Duration: ${_formatDuration(state.statistics!.pausedDuration)}',
+                                ),
+                                Text(
+                                  'Distance: ${state.statistics!.pausedDistanceInKm.toStringAsFixed(2)} km',
+                                ),
+                                Text(
+                                  'Speed: ${state.statistics!.pausedAverageSpeedKmh.toStringAsFixed(1)} km/h',
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                     ],
                   ),
                 ),

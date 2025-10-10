@@ -47,7 +47,7 @@ class TraceLocalDataSource {
 
     for (final row in results) {
       final trace = row.readTable(db.traceMetadatas);
-      final point = row.readTable(db.tracePoints);
+      final point = row.readTableOrNull(db.tracePoints);
 
       traceMap.putIfAbsent(
         trace.id,
@@ -59,14 +59,16 @@ class TraceLocalDataSource {
         ),
       );
 
-      traceMap[trace.id]!.points.add(
-        TracePointModel(
-          latitude: point.latitude,
-          longitude: point.longitude,
-          elevation: point.elevation,
-          time: point.time,
-        ),
-      );
+      if (point != null) {
+        traceMap[trace.id]!.points.add(
+          TracePointModel(
+            latitude: point.latitude,
+            longitude: point.longitude,
+            elevation: point.elevation,
+            time: point.time,
+          ),
+        );
+      }
     }
 
     return traceMap.values.toList();

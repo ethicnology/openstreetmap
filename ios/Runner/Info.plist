@@ -51,8 +51,8 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs access to your location to show your position on the map.</string>
+	<string>This app needs to access your location to track your activity when you are running.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app needs access to your location even when the app is in the background.</string>
+	<string>This app needs to access your location to track your activity when you are running.</string>
 </dict>
 </plist>

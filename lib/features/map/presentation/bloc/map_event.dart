@@ -1,4 +1,5 @@
 import 'package:latlong2/latlong.dart';
+import 'package:openstreetmap/features/map/domain/entities/position_entity.dart';
 
 sealed class MapEvent {
   const MapEvent();
@@ -12,8 +13,8 @@ class FetchLocation extends MapEvent {
   const FetchLocation();
 }
 
-class BeginActivity extends MapEvent {
-  const BeginActivity();
+class StartActivity extends MapEvent {
+  const StartActivity();
 }
 
 class CeaseActivity extends MapEvent {
@@ -21,7 +22,8 @@ class CeaseActivity extends MapEvent {
 }
 
 class ScoreActivity extends MapEvent {
-  const ScoreActivity();
+  final PositionEntity position;
+  const ScoreActivity({required this.position});
 }
 
 class PauseActivity extends MapEvent {
@@ -36,4 +38,8 @@ class FetchTraces extends MapEvent {
 
 class ClearError extends MapEvent {
   const ClearError();
+}
+
+class UpdateElapsedTime extends MapEvent {
+  const UpdateElapsedTime();
 }
