@@ -37,11 +37,11 @@ dependencies:
   flutter_map: ^8.1.1
   vector_map_tiles: ^9.0.0-beta.8
   flutter_bloc: ^9.1.1
-  equatable: ^2.0.5
   flutter_dotenv: ^5.1.0
   get_it: ^8.0.3
   latlong2: ^0.9.1
   geolocator: ^11.0.0
+  permission_handler: ^12.0.1
   http: ^1.4.0
   xml: ^6.5.0
   drift: ^2.26.1

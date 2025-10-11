@@ -54,5 +54,11 @@
 	<string>This app needs to access your location to track your activity when you are running.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app needs to access your location to track your activity when you are running.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs to access your location to track your activity when you are running in the background.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 </dict>
 </plist>
