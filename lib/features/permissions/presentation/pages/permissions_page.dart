@@ -1,0 +1,138 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:openstreetmap/features/permissions/presentation/bloc/permissions_bloc.dart';
+import 'package:openstreetmap/features/permissions/presentation/bloc/permissions_event.dart';
+import 'package:openstreetmap/features/permissions/presentation/bloc/permissions_state.dart';
+import 'package:openstreetmap/main.dart';
+
+class PermissionsPage extends StatefulWidget {
+  const PermissionsPage({super.key});
+
+  @override
+  State<PermissionsPage> createState() => _PermissionsPageState();
+}
+
+class _PermissionsPageState extends State<PermissionsPage>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    context.read<PermissionsBloc>().add(const LoadPermissions());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      context.read<PermissionsBloc>().add(const LoadPermissions());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Permissions Required'),
+        centerTitle: true,
+      ),
+      body: BlocBuilder<PermissionsBloc, PermissionsState>(
+        builder: (context, state) {
+          if (state.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final allRequiredGranted = state.requiredGranted;
+
+          return Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'This app needs the following permissions to work properly',
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: state.permissions.length,
+                    itemBuilder: (context, index) {
+                      final permission = state.permissions[index];
+
+                      return Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    permission.isGranted
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        permission.isGranted
+                                            ? Colors.green
+                                            : Colors.red,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(child: Text(permission.name)),
+                                ],
+                              ),
+                              Text(permission.description),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black12,
+                                ),
+                                onPressed:
+                                    permission.isGranted
+                                        ? null
+                                        : () {
+                                          context.read<PermissionsBloc>().add(
+                                            RequestPermission(
+                                              permission.permission,
+                                            ),
+                                          );
+                                        },
+                                child: Text('Grant Permission'),
+                              ),
+
+                              if (permission.isPermanentlyDenied)
+                                const Text(
+                                  'This permission has to be enabled in app settings.',
+                                ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed:
+                        allRequiredGranted
+                            ? () {
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) =>
+                                          const BottomNavigationWidget(),
+                                ),
+                              );
+                            }
+                            : null,
+                    child: Text(
+                      allRequiredGranted
+                          ? 'Continue'
+                          : 'Grant Required Permissions to Continue',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

@@ -1,0 +1,22 @@
+import 'package:dart_mappable/dart_mappable.dart';
+import 'package:openstreetmap/core/errors.dart';
+import 'package:openstreetmap/features/permissions/domain/entities/permission_entity.dart';
+
+part 'permissions_state.mapper.dart';
+
+@MappableClass()
+class PermissionsState with PermissionsStateMappable {
+  final List<PermissionEntity> permissions;
+  final bool isLoading;
+  final bool requiredGranted;
+  final bool optionalGranted;
+  final AppError? errorMessage;
+
+  const PermissionsState({
+    this.permissions = const [],
+    this.isLoading = false,
+    this.requiredGranted = false,
+    this.optionalGranted = false,
+    this.errorMessage,
+  });
+}
