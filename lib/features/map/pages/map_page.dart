@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart' show LatLng;
 import 'package:openstreetmap/core/global.dart';
 import 'package:openstreetmap/core/entities/activity_entity.dart';
 import 'package:openstreetmap/core/entities/position_entity.dart';
+import 'package:openstreetmap/core/usecases/get_user_location_use_case.dart';
 import 'package:openstreetmap/features/map/bloc/map_bloc.dart';
 import 'package:openstreetmap/features/map/bloc/map_state.dart';
 import 'package:openstreetmap/features/map/bloc/map_event.dart';
@@ -121,13 +122,13 @@ class _MapPageState extends State<MapPage> {
                 FloatingActionButton(
                   onPressed: () {
                     if (state.userLocation == null) return;
-                    _mapController.move(
-                      LatLng(
-                        state.userLocation!.latitude,
-                        state.userLocation!.longitude,
-                      ),
-                      Global.maxZoom,
-                    );
+                    GetUserLocationUseCase().call().then((position) {
+                      bloc.add(UpdateUserLocation(position: position));
+                      _mapController.move(
+                        LatLng(position.latitude, position.longitude),
+                        Global.maxZoom,
+                      );
+                    });
                   },
                   child: const Icon(Icons.my_location),
                 ),
