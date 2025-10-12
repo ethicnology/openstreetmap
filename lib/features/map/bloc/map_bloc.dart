@@ -87,12 +87,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
       final activity = await _beginActivityUseCase();
       _activityStartTime = activity.startedAt;
+      emit(state.copyWith(activity: activity));
+
+      final userPosition = await _getUserLocationUseCase();
+      add(UpdateUserLocation(position: userPosition));
+
       _elapsedTimer = Timer.periodic(
         const Duration(seconds: 1),
         (_) => add(const UpdateElapsedTime()),
       );
-
-      emit(state.copyWith(activity: activity));
     } catch (e) {
       emit(state.copyWith(errorMessage: AppError(e.toString())));
     }
@@ -129,20 +132,22 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }
   }
 
-  void _onPauseActivity(PauseActivity event, Emitter<MapState> emit) {
+  void _onPauseActivity(PauseActivity event, Emitter<MapState> emit) async {
     if (state.activity == null) throw ActivityNotStartedError();
 
-    if (state.isPaused) {
-      emit(state.copyWith(isPaused: false));
-    } else {
-      emit(state.copyWith(isPaused: true));
-    }
+    final userPosition = await _getUserLocationUseCase();
+    add(UpdateUserLocation(position: userPosition));
+
+    emit(state.copyWith(isPaused: !state.isPaused));
   }
 
   Future<void> _onCeaseActivity(
     CeaseActivity event,
     Emitter<MapState> emit,
   ) async {
+    final userPosition = await _getUserLocationUseCase();
+    add(UpdateUserLocation(position: userPosition));
+
     _ceaseActivityUsecase(state.activity!.id);
     _elapsedTimer?.cancel();
     _elapsedTimer = null;
