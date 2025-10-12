@@ -60,7 +60,7 @@ class LocationRemoteDataSource {
           notificationText:
               "This app will continue to receive your location when your phone is locked",
           notificationTitle: "Running in background",
-          enableWakeLock: true,
+          enableWakeLock: false,
         ),
       );
     } else if (defaultTargetPlatform == TargetPlatform.iOS ||
