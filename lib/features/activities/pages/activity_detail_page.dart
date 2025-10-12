@@ -67,7 +67,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                                         ? widget.activity.points.first.position
                                             .toLatLng()
                                         : const LatLng(48.8566, 2.3522),
-                                initialZoom: Global.defaultZoom,
+                                initialZoom: Global.maxZoom,
                                 maxZoom: Global.maxZoom,
                               ),
                               children: [
