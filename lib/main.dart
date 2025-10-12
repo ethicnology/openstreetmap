@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:openstreetmap/features/map/presentation/bloc/map_bloc.dart';
-import 'package:openstreetmap/features/activities/presentation/bloc/activities_bloc.dart';
+import 'package:openstreetmap/features/map/bloc/map_bloc.dart';
+import 'package:openstreetmap/features/activities/bloc/activities_bloc.dart';
 import 'package:openstreetmap/features/permissions/presentation/bloc/permissions_bloc.dart';
 import 'package:openstreetmap/features/permissions/presentation/pages/check_permission_page.dart';
 import 'core/locator.dart';
-import 'features/map/presentation/pages/map_page.dart';
-import 'features/activities/presentation/pages/activities_list_page.dart';
+import 'features/map/pages/map_page.dart';
+import 'features/activities/pages/activities_list_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

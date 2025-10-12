@@ -1,6 +1,8 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:openstreetmap/features/map/domain/entities/position_entity.dart';
+import 'package:openstreetmap/core/entities/position_entity.dart';
 
 part 'activity_entity.mapper.dart';
 
@@ -178,5 +180,48 @@ extension ActivityStatisticsExtension on ActivityEntity {
       totalLoss += segmentLoss;
     }
     return (gain: totalGain, loss: totalLoss);
+  }
+}
+
+extension ActivityPathExtension on ActivityEntity {
+  Widget toPolylineLayer() {
+    if (points.isEmpty) return PolylineLayer(polylines: <Polyline>[]);
+
+    final segments = <Polyline>[];
+    var segmentPoints = <ActivityPointEntity>[];
+    ActivityPointStatusEntity? previousStatus;
+
+    for (final point in points) {
+      final hasStatusChanged =
+          previousStatus != null && point.status != previousStatus;
+
+      if (hasStatusChanged) {
+        segments.add(_createPathSegment(segmentPoints, previousStatus));
+        segmentPoints = [];
+      }
+
+      segmentPoints.add(point);
+      previousStatus = point.status;
+    }
+
+    if (segmentPoints.isNotEmpty && previousStatus != null) {
+      segments.add(_createPathSegment(segmentPoints, previousStatus));
+    }
+
+    return PolylineLayer(polylines: segments);
+  }
+
+  Polyline _createPathSegment(
+    List<ActivityPointEntity> points,
+    ActivityPointStatusEntity status,
+  ) {
+    return Polyline(
+      points: points.map((p) => p.position.toLatLng()).toList(),
+      color:
+          status == ActivityPointStatusEntity.active
+              ? Colors.blue
+              : Colors.yellow,
+      strokeWidth: 4.0,
+    );
   }
 }
