@@ -5,8 +5,8 @@ sealed class MapEvent {
   const MapEvent();
 }
 
-class LoadMap extends MapEvent {
-  const LoadMap();
+class InitMap extends MapEvent {
+  const InitMap();
 }
 
 class StartActivity extends MapEvent {

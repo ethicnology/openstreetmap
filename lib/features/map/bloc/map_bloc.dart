@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:openstreetmap/core/errors.dart';
 import 'package:openstreetmap/core/entities/activity_entity.dart';
 import 'package:openstreetmap/core/entities/position_entity.dart';
+import 'package:openstreetmap/core/usecases/get_user_location_use_case.dart';
 import 'package:openstreetmap/core/usecases/start_track_position_use_case.dart';
 import 'package:openstreetmap/core/usecases/score_activity_use_case.dart';
 import 'package:openstreetmap/core/usecases/start_activity_use_case.dart';
@@ -22,13 +23,14 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final _scoreActivityUseCase = ScoreActivityUseCase();
   final _ceaseActivityUsecase = CeaseActivityUseCase();
   final _startTrackPositionUsecase = StartTrackPositionUseCase();
+  final _getUserLocationUseCase = GetUserLocationUseCase();
 
   late StreamSubscription<PositionEntity> _positionStream;
   Timer? _elapsedTimer;
   DateTime? _activityStartTime;
 
   MapBloc() : super(const MapState()) {
-    on<LoadMap>(_onMapLoading);
+    on<InitMap>(_onMapLoading);
     on<FetchTraces>(_onTracesSearchRequested);
     on<StartActivity>(_onStartActivity);
     on<CeaseActivity>(_onCeaseActivity);
@@ -38,19 +40,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<UpdateElapsedTime>(_onUpdateElapsedTime);
     on<UpdateUserLocation>(_onUpdateUserLocation);
 
-    _initUserLocationStream();
-    add(const LoadMap());
-  }
-
-  Future<void> _initUserLocationStream() async {
-    try {
-      final userPositionStream = await _startTrackPositionUsecase();
-      _positionStream = userPositionStream
-          .handleError((error) => print('error: $error'))
-          .listen((position) => add(UpdateUserLocation(position: position)));
-    } catch (e) {
-      add(ClearError());
-    }
+    add(const InitMap());
   }
 
   void _onUpdateUserLocation(UpdateUserLocation event, Emitter<MapState> emit) {
@@ -68,9 +58,17 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     return super.close();
   }
 
-  Future<void> _onMapLoading(LoadMap event, Emitter<MapState> emit) async {
+  Future<void> _onMapLoading(InitMap event, Emitter<MapState> emit) async {
     emit(state.copyWith(isLoading: true));
     try {
+      final userPosition = await _getUserLocationUseCase();
+      emit(state.copyWith(userLocation: userPosition));
+
+      final userPositionStream = await _startTrackPositionUsecase();
+      _positionStream = userPositionStream
+          .handleError((error) => print('error: $error'))
+          .listen((position) => add(UpdateUserLocation(position: position)));
+
       final style = await _getMapConfigUseCase();
       emit(state.copyWith(style: style));
     } catch (e) {
