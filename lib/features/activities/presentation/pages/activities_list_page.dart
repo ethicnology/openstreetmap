@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:openstreetmap/features/activities/domain/usecases/get_activity_statistics_use_case.dart';
 import 'package:openstreetmap/features/activities/presentation/bloc/activities_bloc.dart';
 import 'package:openstreetmap/features/activities/presentation/bloc/activities_event.dart';
 import 'package:openstreetmap/features/activities/presentation/bloc/activities_state.dart';
@@ -72,8 +71,6 @@ class _ActivitiesListPageState extends State<ActivitiesListPage> {
   }
 
   Widget _buildActivityCard(activity) {
-    final statistics = GetActivityStatisticsUseCase()(activity);
-
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       color: Colors.grey[900],
@@ -93,14 +90,14 @@ class _ActivitiesListPageState extends State<ActivitiesListPage> {
             const SizedBox(height: 4),
             Row(
               children: [
-                _buildStatChip(_formatDuration(statistics.activeDuration)),
+                _buildStatChip(_formatDuration(activity.activeDuration)),
                 const SizedBox(width: 8),
                 _buildStatChip(
-                  '${statistics.activeDistanceInKm.toStringAsFixed(1)} km',
+                  '${activity.activeDistanceInKm.toStringAsFixed(1)} km',
                 ),
                 const SizedBox(width: 8),
                 _buildStatChip(
-                  '${statistics.activeAverageSpeedKmh.toStringAsFixed(1)} km/h',
+                  '${activity.activeAverageSpeedKmh.toStringAsFixed(1)} km/h',
                 ),
               ],
             ),

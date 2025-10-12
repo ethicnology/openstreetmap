@@ -1,6 +1,6 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:openstreetmap/core/errors.dart';
-import 'package:openstreetmap/features/map/domain/entities/activity_entity.dart';
+import 'package:openstreetmap/core/entities/activity_entity.dart';
 
 part 'activities_state.mapper.dart';
 

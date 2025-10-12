@@ -5,12 +5,8 @@ sealed class MapEvent {
   const MapEvent();
 }
 
-class FetchMap extends MapEvent {
-  const FetchMap();
-}
-
-class FetchLocation extends MapEvent {
-  const FetchLocation();
+class LoadMap extends MapEvent {
+  const LoadMap();
 }
 
 class StartActivity extends MapEvent {
@@ -42,4 +38,9 @@ class ClearError extends MapEvent {
 
 class UpdateElapsedTime extends MapEvent {
   const UpdateElapsedTime();
+}
+
+class UpdateUserLocation extends MapEvent {
+  final PositionEntity position;
+  const UpdateUserLocation({required this.position});
 }

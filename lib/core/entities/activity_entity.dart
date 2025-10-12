@@ -1,6 +1,44 @@
+import 'package:dart_mappable/dart_mappable.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:openstreetmap/features/activities/domain/entities/activity_statistics_entity.dart';
-import 'package:openstreetmap/features/map/domain/entities/activity_entity.dart';
+import 'package:openstreetmap/features/map/domain/entities/position_entity.dart';
+
+part 'activity_entity.mapper.dart';
+
+@MappableClass()
+class ActivityEntity with ActivityEntityMappable {
+  final String id;
+  final String name;
+  final String description;
+  final DateTime createdAt;
+  final DateTime startedAt;
+  final DateTime? stoppedAt;
+  final List<ActivityPointEntity> points;
+
+  ActivityEntity({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.createdAt,
+    required this.startedAt,
+    required this.stoppedAt,
+    this.points = const [],
+  });
+}
+
+enum ActivityPointStatusEntity { active, paused }
+
+@MappableClass()
+class ActivityPointEntity with ActivityPointEntityMappable {
+  final PositionEntity position;
+  final DateTime time;
+  final ActivityPointStatusEntity status;
+
+  ActivityPointEntity({
+    required this.position,
+    required this.time,
+    required this.status,
+  });
+}
 
 class ActivitySegment {
   final List<ActivityPointEntity> points;
@@ -12,55 +50,42 @@ class ActivitySegment {
   bool get isPaused => status == ActivityPointStatusEntity.paused;
 }
 
-class GetActivityStatisticsUseCase {
-  GetActivityStatisticsUseCase();
+extension ActivityStatisticsExtension on ActivityEntity {
+  double get activeDistanceInKm => activeDistanceMeters / 1000;
 
-  ActivityStatisticsEntity call(ActivityEntity activity) {
-    final activityDuration =
-        activity.stoppedAt != null
-            ? activity.stoppedAt!.difference(activity.startedAt)
-            : DateTime.now().difference(activity.startedAt);
+  double get pausedDistanceInKm => pausedDistanceMeters / 1000;
 
-    if (activity.points.isEmpty) {
-      return ActivityStatisticsEntity(
-        activityDuration: activityDuration,
+  double get activeSpeedMps =>
+      activeDuration.inSeconds > 0
+          ? (activeDistanceMeters / activeDuration.inSeconds)
+          : 0.0;
 
-        activeDuration: Duration.zero,
-        activeDistanceInMeters: 0.0,
-        activeElevationGain: 0.0,
-        activeElevationLoss: 0.0,
+  double get pausedSpeedMps =>
+      pausedDuration.inSeconds > 0
+          ? (pausedDistanceMeters / pausedDuration.inSeconds)
+          : 0.0;
 
-        pausedDuration: Duration.zero,
-        pausedDistanceInMeters: 0.0,
-      );
-    }
+  double get activeSpeedKmh => activeSpeedMps * 3.6;
 
-    final segments = _segmentPoints(activity.points);
-    final activeSegments = segments.where((s) => s.isActive).toList();
-    final pausedSegments = segments.where((s) => s.isPaused).toList();
+  double get pausedSpeedKmh => pausedSpeedMps * 3.6;
 
-    final activeDuration = _calculateSegmentsDuration(activeSegments);
-    final activeDistance = _calculateSegmentsDistance(activeSegments);
-    final (
-      gain: activeElevationGain,
-      loss: activeElevationLoss,
-    ) = _calculateSegmentsElevation(activeSegments);
+  List<ActivitySegment> get segments => _segmentPoints(points);
 
-    final pausedDuration = _calculateSegmentsDuration(pausedSegments);
-    final pausedDistance = _calculateSegmentsDistance(pausedSegments);
+  List<ActivitySegment> get activeSegments =>
+      segments.where((s) => s.isActive).toList();
+  List<ActivitySegment> get pausedSegments =>
+      segments.where((s) => s.isPaused).toList();
 
-    return ActivityStatisticsEntity(
-      activityDuration: activityDuration,
+  Duration get activeDuration => _calculateSegmentsDuration(activeSegments);
+  Duration get pausedDuration => _calculateSegmentsDuration(pausedSegments);
 
-      activeDuration: activeDuration,
-      activeDistanceInMeters: activeDistance,
-      activeElevationGain: activeElevationGain,
-      activeElevationLoss: activeElevationLoss,
+  double get activeDistanceMeters => _calculateSegmentsDistance(activeSegments);
+  double get pausedDistanceMeters => _calculateSegmentsDistance(pausedSegments);
 
-      pausedDuration: pausedDuration,
-      pausedDistanceInMeters: pausedDistance,
-    );
-  }
+  ({double gain, double loss}) get activeElevation =>
+      _calculateSegmentsElevation(activeSegments);
+  ({double gain, double loss}) get pausedElevation =>
+      _calculateSegmentsElevation(pausedSegments);
 
   List<ActivitySegment> _segmentPoints(List<ActivityPointEntity> points) {
     if (points.isEmpty) return [];

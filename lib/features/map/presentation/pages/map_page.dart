@@ -1,10 +1,9 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
 import 'package:openstreetmap/core/global.dart';
-import 'package:openstreetmap/features/map/domain/entities/activity_entity.dart';
+import 'package:openstreetmap/core/entities/activity_entity.dart';
 import 'package:openstreetmap/features/map/domain/entities/position_entity.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_bloc.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_state.dart';
@@ -48,11 +47,12 @@ class _MapPageState extends State<MapPage> {
         BlocListener<MapBloc, MapState>(
           listenWhen:
               (previous, current) =>
-                  (previous.activity == null || previous.points.isEmpty) &&
+                  (previous.activity == null ||
+                      previous.activity!.points.isEmpty) &&
                   current.activity != null &&
-                  current.points.isNotEmpty,
+                  current.activity!.points.isNotEmpty,
           listener: (context, state) {
-            final firstPoint = state.points.first;
+            final firstPoint = state.activity!.points.first;
             _mapController.move(firstPoint.position.toLatLng(), Global.maxZoom);
           },
         ),
@@ -93,8 +93,9 @@ class _MapPageState extends State<MapPage> {
                       ),
                       if (state.traces.isNotEmpty)
                         _buildTracesLayer(state.traces),
-                      if (state.activity != null && state.points.isNotEmpty)
-                        _buildActivityPath(state.points),
+                      if (state.activity != null &&
+                          state.activity!.points.isNotEmpty)
+                        _buildActivityPath(state.activity!.points),
                       if (state.userLocation != null)
                         _buildLocationMarker(
                           PositionEntity(
@@ -118,17 +119,14 @@ class _MapPageState extends State<MapPage> {
               children: [
                 FloatingActionButton(
                   onPressed: () {
-                    bloc.add(const FetchLocation());
-                    Future.delayed(Duration(seconds: 1), () {
-                      if (state.userLocation == null) return;
-                      _mapController.move(
-                        LatLng(
-                          state.userLocation!.latitude,
-                          state.userLocation!.longitude,
-                        ),
-                        15,
-                      );
-                    });
+                    if (state.userLocation == null) return;
+                    _mapController.move(
+                      LatLng(
+                        state.userLocation!.latitude,
+                        state.userLocation!.longitude,
+                      ),
+                      Global.maxZoom,
+                    );
                   },
                   child: const Icon(Icons.my_location),
                 ),
@@ -322,6 +320,8 @@ class _MapPageState extends State<MapPage> {
   Widget _buildActivityStatusWidget() {
     return BlocBuilder<MapBloc, MapState>(
       builder: (context, state) {
+        final activity = context.watch<MapBloc>().state.activity;
+
         return Positioned(
           top: 50,
           left: 16,
@@ -349,28 +349,14 @@ class _MapPageState extends State<MapPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'Recording Activity',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-
-                          Text(
-                            _formatDuration(state.elapsedTime),
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                            ),
-                          ),
+                          Text('Recording Activity'),
+                          Text(_formatDuration(state.elapsedTime)),
                         ],
                       ),
 
                       const SizedBox(height: 4),
 
-                      if (state.statistics != null)
+                      if (activity != null)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -385,16 +371,16 @@ class _MapPageState extends State<MapPage> {
                                   ),
                                 ),
                                 Text(
-                                  'Duration: ${_formatDuration(state.statistics!.activityDuration)}',
+                                  'Duration: ${_formatDuration(activity.activeDuration)}',
                                 ),
                                 Text(
-                                  'Distance: ${state.statistics!.activeDistanceInKm.toStringAsFixed(2)} km',
+                                  'Distance: ${activity.activeDistanceInKm.toStringAsFixed(2)} km',
                                 ),
                                 Text(
-                                  'Speed: ${state.statistics!.activeAverageSpeedKmh.toStringAsFixed(1)} km/h',
+                                  'Speed: ${activity.activeSpeedKmh.toStringAsFixed(1)} km/h',
                                 ),
                                 Text(
-                                  'Elevation: +${state.statistics!.activeElevationGain.toStringAsFixed(0)}m / -${state.statistics!.activeElevationLoss.toStringAsFixed(0)}m',
+                                  'Elevation: +${activity.activeElevation.gain.toStringAsFixed(0)}m / -${activity.activeElevation.loss.toStringAsFixed(0)}m',
                                 ),
                               ],
                             ),
@@ -410,13 +396,13 @@ class _MapPageState extends State<MapPage> {
                                   ),
                                 ),
                                 Text(
-                                  'Duration: ${_formatDuration(state.statistics!.pausedDuration)}',
+                                  'Duration: ${_formatDuration(activity.pausedDuration)}',
                                 ),
                                 Text(
-                                  'Distance: ${state.statistics!.pausedDistanceInKm.toStringAsFixed(2)} km',
+                                  'Distance: ${activity.pausedDistanceInKm.toStringAsFixed(2)} km',
                                 ),
                                 Text(
-                                  'Speed: ${state.statistics!.pausedAverageSpeedKmh.toStringAsFixed(1)} km/h',
+                                  'Speed: ${activity.pausedSpeedKmh.toStringAsFixed(1)} km/h',
                                 ),
                               ],
                             ),

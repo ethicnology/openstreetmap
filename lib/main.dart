@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:openstreetmap/features/map/presentation/bloc/map_bloc.dart';
-import 'package:openstreetmap/features/map/presentation/bloc/map_event.dart';
 import 'package:openstreetmap/features/activities/presentation/bloc/activities_bloc.dart';
 import 'package:openstreetmap/features/permissions/presentation/bloc/permissions_bloc.dart';
 import 'package:openstreetmap/features/permissions/presentation/pages/check_permission_page.dart';
@@ -24,9 +23,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => getIt<MapBloc>()..add(const FetchMap()),
-        ),
+        BlocProvider(create: (context) => getIt<MapBloc>()),
         BlocProvider(create: (context) => getIt<ActivitiesBloc>()),
         BlocProvider(create: (context) => getIt<PermissionsBloc>()),
       ],

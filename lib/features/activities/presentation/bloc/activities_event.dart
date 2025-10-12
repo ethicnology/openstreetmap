@@ -1,4 +1,4 @@
-import 'package:openstreetmap/features/map/domain/entities/activity_entity.dart';
+import 'package:openstreetmap/core/entities/activity_entity.dart';
 
 sealed class ActivitiesEvent {
   const ActivitiesEvent();

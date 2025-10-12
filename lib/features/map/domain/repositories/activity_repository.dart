@@ -1,6 +1,6 @@
 import 'package:openstreetmap/features/map/data/datasources/activity_local_data_source.dart';
 import 'package:openstreetmap/features/map/data/models/activity_model.dart';
-import 'package:openstreetmap/features/map/domain/entities/activity_entity.dart';
+import 'package:openstreetmap/core/entities/activity_entity.dart';
 
 class ActivityRepository {
   final localActivities = ActivityLocalDataSource();

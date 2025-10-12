@@ -1,7 +1,6 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:openstreetmap/core/errors.dart';
-import 'package:openstreetmap/features/activities/domain/entities/activity_statistics_entity.dart';
-import 'package:openstreetmap/features/map/domain/entities/activity_entity.dart';
+import 'package:openstreetmap/core/entities/activity_entity.dart';
 import 'package:openstreetmap/features/map/domain/entities/position_entity.dart';
 import 'package:openstreetmap/features/map/domain/entities/trace_entity.dart';
 import 'package:vector_map_tiles/vector_map_tiles.dart';
@@ -17,10 +16,8 @@ class MapState with MapStateMappable {
   final List<TraceEntity> traces;
   final bool isLoading;
   final ActivityEntity? activity;
-  final List<ActivityPointEntity> points;
   final Duration elapsedTime;
   final bool isPaused;
-  final ActivityStatisticsEntity? statistics;
 
   const MapState({
     this.style,
@@ -30,9 +27,7 @@ class MapState with MapStateMappable {
     this.traces = const [],
     this.isLoading = false,
     this.activity,
-    this.points = const [],
     this.elapsedTime = Duration.zero,
     this.isPaused = false,
-    this.statistics,
   });
 }

@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:openstreetmap/core/global.dart';
-import 'package:openstreetmap/features/activities/domain/entities/activity_statistics_entity.dart';
-import 'package:openstreetmap/features/activities/domain/usecases/get_activity_statistics_use_case.dart';
-import 'package:openstreetmap/features/map/domain/entities/activity_entity.dart';
+import 'package:openstreetmap/core/entities/activity_entity.dart';
 import 'package:openstreetmap/features/map/domain/entities/position_entity.dart';
 import 'package:openstreetmap/features/map/domain/usecases/get_map_tile_url_use_case.dart';
 import 'package:vector_map_tiles/vector_map_tiles.dart';
@@ -28,10 +26,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
   void initState() {
     super.initState();
     _loadMapStyle();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final statistics = GetActivityStatisticsUseCase()(widget.activity);
-      _showStatisticsBottomSheet(context, statistics);
-    });
   }
 
   Future<void> _loadMapStyle() async {
@@ -50,8 +44,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final statistics = GetActivityStatisticsUseCase()(widget.activity);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.activity.name),
@@ -97,7 +89,10 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                     right: 16,
                     child: ElevatedButton.icon(
                       onPressed:
-                          () => _showStatisticsBottomSheet(context, statistics),
+                          () => _showStatisticsBottomSheet(
+                            context,
+                            widget.activity,
+                          ),
                       icon: const Icon(Icons.analytics),
                       label: const Text('View Statistics'),
                       style: ElevatedButton.styleFrom(
@@ -144,7 +139,7 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
 
   void _showStatisticsBottomSheet(
     BuildContext context,
-    ActivityStatisticsEntity statistics,
+    ActivityEntity activity,
   ) {
     showModalBottomSheet(
       context: context,
@@ -160,12 +155,12 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                 top: Radius.circular(20),
               ),
             ),
-            child: _buildStatisticsPanel(statistics),
+            child: _buildStatisticsPanel(activity),
           ),
     );
   }
 
-  Widget _buildStatisticsPanel(ActivityStatisticsEntity statistics) {
+  Widget _buildStatisticsPanel(ActivityEntity activity) {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Row(
@@ -178,15 +173,13 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                 'Active',
                 style: TextStyle(color: Colors.white70, fontSize: 12),
               ),
-              Text('Duration: ${_formatDuration(statistics.activityDuration)}'),
+              Text('Duration: ${_formatDuration(activity.activeDuration)}'),
               Text(
-                'Distance: ${statistics.activeDistanceInKm.toStringAsFixed(2)} km',
+                'Distance: ${activity.activeDistanceInKm.toStringAsFixed(2)} km',
               ),
+              Text('Speed: ${activity.activeSpeedKmh.toStringAsFixed(1)} km/h'),
               Text(
-                'Speed: ${statistics.activeAverageSpeedKmh.toStringAsFixed(1)} km/h',
-              ),
-              Text(
-                'Elevation: +${statistics.activeElevationGain.toStringAsFixed(0)}m / -${statistics.activeElevationLoss.toStringAsFixed(0)}m',
+                'Elevation: +${activity.activeElevation.gain.toStringAsFixed(0)}m / -${activity.activeElevation.loss.toStringAsFixed(0)}m',
               ),
             ],
           ),
@@ -198,13 +191,11 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                 'Paused',
                 style: TextStyle(color: Colors.white70, fontSize: 12),
               ),
-              Text('Duration: ${_formatDuration(statistics.pausedDuration)}'),
+              Text('Duration: ${_formatDuration(activity.pausedDuration)}'),
               Text(
-                'Distance: ${statistics.pausedDistanceInKm.toStringAsFixed(2)} km',
+                'Distance: ${activity.pausedDistanceInKm.toStringAsFixed(2)} km',
               ),
-              Text(
-                'Speed: ${statistics.pausedAverageSpeedKmh.toStringAsFixed(1)} km/h',
-              ),
+              Text('Speed: ${activity.pausedSpeedKmh.toStringAsFixed(1)} km/h'),
             ],
           ),
         ],
