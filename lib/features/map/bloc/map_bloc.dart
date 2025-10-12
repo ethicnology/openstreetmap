@@ -30,7 +30,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   DateTime? _activityStartTime;
 
   MapBloc() : super(const MapState()) {
-    on<InitMap>(_onMapLoading);
+    on<InitMap>(_onInitMap);
     on<FetchTraces>(_onTracesSearchRequested);
     on<StartActivity>(_onStartActivity);
     on<CeaseActivity>(_onCeaseActivity);
@@ -58,7 +58,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     return super.close();
   }
 
-  Future<void> _onMapLoading(InitMap event, Emitter<MapState> emit) async {
+  Future<void> _onInitMap(InitMap event, Emitter<MapState> emit) async {
     emit(state.copyWith(isLoading: true));
     try {
       final userPosition = await _getUserLocationUseCase();
@@ -86,8 +86,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       _elapsedTimer?.cancel();
 
       final activity = await _beginActivityUseCase();
-
-      _activityStartTime = DateTime.now();
+      _activityStartTime = activity.startedAt;
       _elapsedTimer = Timer.periodic(
         const Duration(seconds: 1),
         (_) => add(const UpdateElapsedTime()),
