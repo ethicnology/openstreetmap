@@ -119,6 +119,16 @@ class _MapPageState extends State<MapPage> {
               children: [
                 FloatingActionButton(
                   onPressed: () {
+                    final center = _mapController.camera.center;
+                    bloc.add(FetchTraces(center: center));
+                  },
+                  child: const Icon(Icons.search),
+                ),
+
+                const SizedBox(height: 16),
+
+                FloatingActionButton(
+                  onPressed: () {
                     if (state.userLocation == null) return;
                     _mapController.move(
                       LatLng(
@@ -130,19 +140,12 @@ class _MapPageState extends State<MapPage> {
                   },
                   child: const Icon(Icons.my_location),
                 ),
-                const SizedBox(height: 16),
-                FloatingActionButton(
-                  onPressed: () {
-                    final center = _mapController.camera.center;
-                    bloc.add(FetchTraces(center: center));
-                  },
-                  child: const Icon(Icons.search),
-                ),
 
                 if (state.isPaused && state.activity != null) ...[
                   const SizedBox(height: 16),
                   FloatingActionButton(
                     onPressed: () => bloc.add(const CeaseActivity()),
+                    backgroundColor: Colors.red,
                     child: const Icon(Icons.stop),
                   ),
                 ],
@@ -151,10 +154,12 @@ class _MapPageState extends State<MapPage> {
                   const SizedBox(height: 16),
                   FloatingActionButton(
                     onPressed: () => bloc.add(const PauseActivity()),
+                    backgroundColor:
+                        state.isPaused ? Colors.blue : Colors.yellow,
                     child:
                         state.isPaused
                             ? const Icon(Icons.play_arrow)
-                            : const Icon(Icons.pause),
+                            : const Icon(Icons.pause, color: Colors.black),
                   ),
                 ],
 
@@ -164,6 +169,7 @@ class _MapPageState extends State<MapPage> {
                     onPressed: () {
                       bloc.add(const StartActivity());
                     },
+                    backgroundColor: Colors.green,
                     child: const Icon(Icons.play_arrow),
                   ),
                 ],
@@ -283,21 +289,11 @@ class _MapPageState extends State<MapPage> {
 
         return Positioned(
           top: 50,
-          left: 16,
-          right: 16,
+          left: 0,
+          right: 0,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.black87,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(color: Colors.black54),
             child: Row(
               children: [
                 Expanded(
@@ -306,7 +302,7 @@ class _MapPageState extends State<MapPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Text('Recording Activity'),
                           Text(state.elapsedTime.toHHMMSS()),
