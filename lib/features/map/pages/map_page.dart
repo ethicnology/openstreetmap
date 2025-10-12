@@ -59,16 +59,7 @@ class _MapPageState extends State<MapPage> {
       ],
       child: BlocBuilder<MapBloc, MapState>(
         builder: (context, state) {
-          final location =
-              state.userLocation ??
-              state.searchCenter ??
-              PositionEntity(
-                latitude: 48.8566,
-                longitude: 2.3522,
-                elevation: 0,
-              );
-
-          if (state.style == null) {
+          if (state.style == null || state.userLocation == null) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -80,7 +71,7 @@ class _MapPageState extends State<MapPage> {
                   child: FlutterMap(
                     mapController: _mapController,
                     options: MapOptions(
-                      initialCenter: location.toLatLng(),
+                      initialCenter: state.userLocation!.toLatLng(),
                       initialZoom: Global.defaultZoom,
                       maxZoom: Global.maxZoom,
                     ),
