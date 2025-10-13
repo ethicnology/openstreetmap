@@ -11,6 +11,8 @@ class BottomNavigationWidget extends StatefulWidget {
 }
 
 class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
+  late final PageController _pageController;
+
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
@@ -20,12 +22,35 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) => setState(() => _currentIndex = index),
+        children: _pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (index) {
+          setState(() => _currentIndex = index);
+          _pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+        },
         backgroundColor: Colors.black87,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey,
