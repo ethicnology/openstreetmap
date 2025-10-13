@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:openstreetmap/core/widgets/bottom_navigation_widget.dart';
 import 'package:openstreetmap/features/permissions/presentation/bloc/permissions_bloc.dart';
 import 'package:openstreetmap/features/permissions/presentation/bloc/permissions_event.dart';
 import 'package:openstreetmap/features/permissions/presentation/bloc/permissions_state.dart';
 import 'package:openstreetmap/features/permissions/presentation/pages/permissions_page.dart';
-import 'package:openstreetmap/main.dart';
 
 class CheckPermissionPage extends StatefulWidget {
   const CheckPermissionPage({super.key});
@@ -41,9 +41,7 @@ class _PermissionCheckPageState extends State<CheckPermissionPage> {
   Widget build(BuildContext context) {
     return BlocListener<PermissionsBloc, PermissionsState>(
       listener: (context, state) {
-        if (!state.isLoading) {
-          _navigate(state.requiredGranted && state.optionalGranted);
-        }
+        if (!state.isLoading) _navigate(state.requiredGranted);
       },
       child: const Scaffold(body: Center(child: CircularProgressIndicator())),
     );
