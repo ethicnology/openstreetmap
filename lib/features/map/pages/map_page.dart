@@ -110,6 +110,7 @@ class _MapPageState extends State<MapPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 FloatingActionButton(
+                  heroTag: 'search',
                   onPressed: () {
                     final center = _mapController.camera.center;
                     bloc.add(FetchTraces(center: center));
@@ -120,6 +121,7 @@ class _MapPageState extends State<MapPage> {
                 const SizedBox(height: 16),
 
                 FloatingActionButton(
+                  heroTag: 'location',
                   onPressed: () {
                     if (state.userLocation == null) return;
                     GetUserLocationUseCase().call().then((position) {
@@ -136,6 +138,7 @@ class _MapPageState extends State<MapPage> {
                 if (state.isPaused && state.activity != null) ...[
                   const SizedBox(height: 16),
                   FloatingActionButton(
+                    heroTag: 'stop',
                     onPressed: () => bloc.add(const CeaseActivity()),
                     backgroundColor: Colors.red,
                     child: const Icon(Icons.stop),
@@ -145,6 +148,7 @@ class _MapPageState extends State<MapPage> {
                 if (state.activity != null) ...[
                   const SizedBox(height: 16),
                   FloatingActionButton(
+                    heroTag: 'pause',
                     onPressed: () => bloc.add(const PauseActivity()),
                     backgroundColor:
                         state.isPaused ? Colors.blue : Colors.yellow,
@@ -158,9 +162,8 @@ class _MapPageState extends State<MapPage> {
                 if (state.activity == null) ...[
                   const SizedBox(height: 16),
                   FloatingActionButton(
-                    onPressed: () {
-                      bloc.add(const StartActivity());
-                    },
+                    heroTag: 'start',
+                    onPressed: () => bloc.add(const StartActivity()),
                     backgroundColor: Colors.green,
                     child: const Icon(Icons.play_arrow),
                   ),
