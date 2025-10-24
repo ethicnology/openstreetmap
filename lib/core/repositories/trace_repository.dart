@@ -1,7 +1,7 @@
 import 'package:openstreetmap/core/data/datasources/trace_local_data_source.dart';
 import 'package:openstreetmap/core/data/datasources/trace_remote_data_source.dart';
+import 'package:openstreetmap/core/data/models/trace_model.dart';
 import 'package:openstreetmap/core/entities/trace_entity.dart';
-import 'package:openstreetmap/core/data/mappers/trace_mapper.dart';
 
 class TraceRepository {
   final remoteTraces = TraceRemoteDataSource();
@@ -24,11 +24,11 @@ class TraceRepository {
       page,
     );
 
-    return TraceMapper.toEntities(traces);
+    return traces.map(TraceModel.toEntity).toList();
   }
 
   Future<void> store(List<TraceEntity> traces) async {
-    final models = TraceMapper.fromEntities(traces);
+    final models = traces.map(TraceModel.fromEntity).toList();
     for (final model in models) {
       await localTraces.store(model);
     }

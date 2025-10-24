@@ -1,7 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart';
 import 'package:openstreetmap/core/data/models/trace_model.dart';
-import 'package:openstreetmap/core/data/mappers/trace_mapper.dart';
 
 class TraceRemoteDataSource {
   Future<List<TraceModel>> getPublicTraces(
@@ -19,7 +18,7 @@ class TraceRemoteDataSource {
     if (response.statusCode == 200) {
       final document = XmlDocument.parse(response.body);
       final tracks = document.findAllElements('trk');
-      final traces = tracks.map(TraceMapper.fromXml).toList();
+      final traces = tracks.map(TraceModel.fromGpx).toList();
       return traces;
     } else {
       throw Exception('Failed to load traces: ${response.statusCode}');
