@@ -1,5 +1,5 @@
-import 'package:openstreetmap/core/data/datasources/local_preferences_data_source.dart';
-import 'package:openstreetmap/core/data/models/preferences_model.dart';
+import 'package:openstreetmap/core/datasources/local_preferences_data_source.dart';
+import 'package:openstreetmap/core/models/preferences_model.dart';
 import 'package:openstreetmap/core/entities/preferences_entity.dart';
 
 class PreferencesRepository {

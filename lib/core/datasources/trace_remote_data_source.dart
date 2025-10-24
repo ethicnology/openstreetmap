@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart';
-import 'package:openstreetmap/core/data/models/trace_model.dart';
+import 'package:openstreetmap/core/models/trace_model.dart';
 
 class TraceRemoteDataSource {
   Future<List<TraceModel>> getPublicTraces(

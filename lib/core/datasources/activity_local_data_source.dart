@@ -2,7 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:openstreetmap/core/database/local_database.dart';
 import 'package:openstreetmap/core/errors.dart';
 import 'package:openstreetmap/core/locator.dart';
-import 'package:openstreetmap/core/data/models/activity_model.dart';
+import 'package:openstreetmap/core/models/activity_model.dart';
 
 class ActivityLocalDataSource {
   final db = getIt.get<LocalDatabase>();

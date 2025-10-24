@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:openstreetmap/core/data/models/preferences_model.dart';
+import 'package:openstreetmap/core/models/preferences_model.dart';
 import 'package:openstreetmap/core/database/local_database.dart';
 import 'package:openstreetmap/core/locator.dart';
 

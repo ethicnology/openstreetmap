@@ -1,9 +1,9 @@
 import 'package:get_it/get_it.dart';
 import 'package:openstreetmap/features/activities/bloc/activities_bloc.dart';
-import 'package:openstreetmap/core/data/datasources/location_remote_data_source.dart';
-import 'package:openstreetmap/core/data/datasources/map_remote_data_source.dart';
-import 'package:openstreetmap/core/data/datasources/trace_remote_data_source.dart';
-import 'package:openstreetmap/core/data/datasources/trace_local_data_source.dart';
+import 'package:openstreetmap/core/datasources/location_remote_data_source.dart';
+import 'package:openstreetmap/core/datasources/map_remote_data_source.dart';
+import 'package:openstreetmap/core/datasources/trace_remote_data_source.dart';
+import 'package:openstreetmap/core/datasources/trace_local_data_source.dart';
 import 'package:openstreetmap/core/repositories/trace_repository.dart';
 import 'package:openstreetmap/core/repositories/location_repository.dart';
 import 'package:openstreetmap/core/repositories/map_repository.dart';

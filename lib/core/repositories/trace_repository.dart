@@ -1,6 +1,6 @@
-import 'package:openstreetmap/core/data/datasources/trace_local_data_source.dart';
-import 'package:openstreetmap/core/data/datasources/trace_remote_data_source.dart';
-import 'package:openstreetmap/core/data/models/trace_model.dart';
+import 'package:openstreetmap/core/datasources/trace_local_data_source.dart';
+import 'package:openstreetmap/core/datasources/trace_remote_data_source.dart';
+import 'package:openstreetmap/core/models/trace_model.dart';
 import 'package:openstreetmap/core/entities/trace_entity.dart';
 
 class TraceRepository {

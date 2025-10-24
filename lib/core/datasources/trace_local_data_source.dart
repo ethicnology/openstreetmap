@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:openstreetmap/core/database/local_database.dart';
 import 'package:openstreetmap/core/locator.dart';
-import 'package:openstreetmap/core/data/models/trace_model.dart';
+import 'package:openstreetmap/core/models/trace_model.dart';
 
 class TraceLocalDataSource {
   final db = getIt.get<LocalDatabase>();
