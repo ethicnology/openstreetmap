@@ -4,10 +4,10 @@ import 'package:openstreetmap/core/errors.dart';
 import 'package:openstreetmap/core/locator.dart';
 import 'package:openstreetmap/core/models/activity_model.dart';
 
-class LocalActivityDataSource {
+class ActivityLocalDataSource {
   final db = getIt.get<LocalDatabase>();
 
-  LocalActivityDataSource();
+  ActivityLocalDataSource();
 
   Future<void> store(ActivityModel activity) async {
     await db

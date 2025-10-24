@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:openstreetmap/core/errors.dart';
 
-class LocationRemoteDataSource {
+class LocationGpsDataSource {
   StreamSubscription<Position>? _positionStreamSubscription;
   StreamSubscription<ServiceStatus>? _serviceStatusStreamSubscription;
 

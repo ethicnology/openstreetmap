@@ -1,6 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:openstreetmap/features/activities/bloc/activities_bloc.dart';
-import 'package:openstreetmap/core/datasources/location_remote_data_source.dart';
+import 'package:openstreetmap/core/datasources/location_gps_data_source.dart';
 import 'package:openstreetmap/core/datasources/map_remote_data_source.dart';
 import 'package:openstreetmap/core/datasources/trace_remote_data_source.dart';
 import 'package:openstreetmap/core/datasources/trace_local_data_source.dart';
@@ -37,8 +37,8 @@ class Locator {
     getIt.registerLazySingleton<MapRemoteDataSource>(
       () => MapRemoteDataSource(),
     );
-    getIt.registerLazySingleton<LocationRemoteDataSource>(
-      () => LocationRemoteDataSource(),
+    getIt.registerLazySingleton<LocationGpsDataSource>(
+      () => LocationGpsDataSource(),
     );
     getIt.registerLazySingleton<TraceRemoteDataSource>(
       () => TraceRemoteDataSource(),
