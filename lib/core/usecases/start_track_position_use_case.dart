@@ -1,9 +1,11 @@
 import 'package:openstreetmap/core/errors.dart';
 import 'package:openstreetmap/core/entities/position_entity.dart';
 import 'package:openstreetmap/core/repositories/location_repository.dart';
+import 'package:openstreetmap/core/repositories/preferences_repository.dart';
 
 class StartTrackPositionUseCase {
   final locationRepository = LocationRepository();
+  final preferencesRepository = PreferencesRepository();
 
   StartTrackPositionUseCase();
 
@@ -13,6 +15,9 @@ class StartTrackPositionUseCase {
       final granted = await locationRepository.requestLocationPermission();
       if (!granted) throw AppError('Location permission not granted');
     }
-    return locationRepository.getPositionStream();
+    final preferences = await preferencesRepository.fetch();
+    return locationRepository.getPositionStream(
+      accuracyInMeters: preferences.accuracyInMeters,
+    );
   }
 }

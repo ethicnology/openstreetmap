@@ -18,14 +18,16 @@ class LocationRepository {
     );
   }
 
-  Stream<PositionEntity> getPositionStream() {
-    return remoteDataSource.getPositionStream().map((position) {
-      return PositionEntity(
-        latitude: position.latitude,
-        longitude: position.longitude,
-        elevation: position.altitude,
-      );
-    });
+  Stream<PositionEntity> getPositionStream({required int accuracyInMeters}) {
+    return remoteDataSource
+        .getPositionStream(accuracyInMeters: accuracyInMeters)
+        .map((position) {
+          return PositionEntity(
+            latitude: position.latitude,
+            longitude: position.longitude,
+            elevation: position.altitude,
+          );
+        });
   }
 
   Stream<ServiceStatus> getServiceStatusStream() {

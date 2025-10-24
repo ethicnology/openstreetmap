@@ -18,8 +18,10 @@ class LocationGpsDataSource {
     return position;
   }
 
-  Stream<Position> getPositionStream() {
-    final locationSettings = getLocationSettings();
+  Stream<Position> getPositionStream({required int accuracyInMeters}) {
+    final locationSettings = getLocationSettings(
+      accuracyInMeters: accuracyInMeters,
+    );
     return Geolocator.getPositionStream(locationSettings: locationSettings);
   }
 
@@ -43,14 +45,13 @@ class LocationGpsDataSource {
     return await Geolocator.isLocationServiceEnabled();
   }
 
-  getLocationSettings() {
+  getLocationSettings({required int accuracyInMeters}) {
     late LocationSettings locationSettings;
-    const distanceFilter = 0;
 
     if (defaultTargetPlatform == TargetPlatform.android) {
       locationSettings = AndroidSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: distanceFilter,
+        distanceFilter: accuracyInMeters,
         forceLocationManager: true,
         intervalDuration: const Duration(milliseconds: 5000),
         useMSLAltitude: true,
@@ -68,7 +69,7 @@ class LocationGpsDataSource {
       locationSettings = AppleSettings(
         accuracy: LocationAccuracy.high,
         activityType: ActivityType.fitness,
-        distanceFilter: distanceFilter,
+        distanceFilter: accuracyInMeters,
         pauseLocationUpdatesAutomatically: true,
         // Only set to true if our app will be started up in the background.
         showBackgroundLocationIndicator: false,
@@ -77,7 +78,7 @@ class LocationGpsDataSource {
     } else {
       locationSettings = LocationSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: distanceFilter,
+        distanceFilter: accuracyInMeters,
       );
     }
     return locationSettings;
