@@ -1,0 +1,139 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:openstreetmap/core/entities/preferences_entity.dart';
+import 'package:openstreetmap/features/preferences/bloc/preferences_bloc.dart';
+import 'package:openstreetmap/features/preferences/bloc/preferences_event.dart';
+import 'package:openstreetmap/features/preferences/bloc/preferences_state.dart';
+
+class PreferencesPage extends StatelessWidget {
+  const PreferencesPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => PreferencesBloc(),
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Preferences'), centerTitle: true),
+        body: BlocBuilder<PreferencesBloc, PreferencesState>(
+          builder: (context, state) {
+            if (state.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (state.preferences == null) {
+              return const Center(child: Text('No preferences found'));
+            }
+
+            return ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                _buildMapThemeSection(context, state),
+                const SizedBox(height: 24),
+                _buildMapLanguageSection(context, state),
+                const SizedBox(height: 24),
+                _buildAccuracySection(context, state),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMapThemeSection(BuildContext context, PreferencesState state) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Map Theme',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<MapThemeEntity>(
+          value: state.preferences!.mapTheme,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
+          items:
+              MapThemeEntity.values.map((theme) {
+                return DropdownMenuItem(
+                  value: theme,
+                  child: Text(theme.name.toUpperCase()),
+                );
+              }).toList(),
+          onChanged: (value) {
+            if (value != null) {
+              context.read<PreferencesBloc>().add(UpdateMapTheme(value));
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMapLanguageSection(
+    BuildContext context,
+    PreferencesState state,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Map Language',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<MapLanguageEntity>(
+          value: state.preferences!.mapLanguage,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
+          items:
+              MapLanguageEntity.values.map((language) {
+                return DropdownMenuItem(
+                  value: language,
+                  child: Text(language.name.toUpperCase()),
+                );
+              }).toList(),
+          onChanged: (value) {
+            if (value != null) {
+              context.read<PreferencesBloc>().add(UpdateMapLanguage(value));
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAccuracySection(BuildContext context, PreferencesState state) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Accuracy in Meters',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          initialValue: state.preferences!.accuracyInMeters.toString(),
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            suffixText: 'm',
+          ),
+          onChanged: (value) {
+            final accuracy = int.tryParse(value);
+            if (accuracy != null) {
+              context.read<PreferencesBloc>().add(UpdateAccuracy(accuracy));
+            }
+          },
+        ),
+      ],
+    );
+  }
+}
