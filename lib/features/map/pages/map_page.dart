@@ -287,85 +287,147 @@ class _MapPageState extends State<MapPage> {
           left: 0,
           right: 0,
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
             decoration: BoxDecoration(color: Colors.black54),
-            child: Row(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text('Recording Activity'),
-                          Text(state.elapsedTime.toHHMMSS()),
-                        ],
-                      ),
-
-                      const SizedBox(height: 4),
-
-                      if (activity != null)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Active',
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Text(
-                                  'Duration: ${activity.activeDuration.toHHMMSS()}',
-                                ),
-                                Text(
-                                  'Distance: ${activity.activeDistanceInKm.toStringAsFixed(2)} km',
-                                ),
-                                Text(
-                                  'Speed: ${activity.activeSpeedKmh.toStringAsFixed(1)} km/h',
-                                ),
-                                Text(
-                                  'Elevation: +${activity.activeElevation.gain.toStringAsFixed(0)}m / -${activity.activeElevation.loss.toStringAsFixed(0)}m',
-                                ),
-                              ],
-                            ),
-
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Paused',
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Text(
-                                  'Duration: ${activity.pausedDuration.toHHMMSS()}',
-                                ),
-                                Text(
-                                  'Distance: ${activity.pausedDistanceInKm.toStringAsFixed(2)} km',
-                                ),
-                                Text(
-                                  'Speed: ${activity.pausedSpeedKmh.toStringAsFixed(1)} km/h',
-                                ),
-                              ],
-                            ),
-                          ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'Recording Activity',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                    ],
-                  ),
+                      ),
+                    ),
+                    Text(
+                      state.elapsedTime.toHHMMSS(),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
+                if (activity != null) ...[
+                  const SizedBox(height: 6),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: 145),
+                    child: PageView(
+                      children: [
+                        _buildStatsPage(
+                          label: 'Active',
+                          duration: activity.activeDuration.toHHMMSS(),
+                          distance: activity.activeDistanceInKm.toStringAsFixed(
+                            2,
+                          ),
+                          speed: activity.activeSpeedKmh.toStringAsFixed(1),
+                          pace: activity.activePaceMinPerKm,
+                          elevation: activity.activeElevation,
+                        ),
+                        _buildStatsPage(
+                          label: 'Paused',
+                          duration: activity.pausedDuration.toHHMMSS(),
+                          distance: activity.pausedDistanceInKm.toStringAsFixed(
+                            2,
+                          ),
+                          speed: activity.pausedSpeedKmh.toStringAsFixed(1),
+                          pace: activity.pausedPaceMinPerKm,
+                          elevation: null,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildStatsPage({
+    required String label,
+    required String duration,
+    required String distance,
+    required String speed,
+    required String pace,
+    required ({double gain, double loss})? elevation,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                duration,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                '$pace km/m',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '$distance km',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                '$speed km/h',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (elevation != null) ...[
+                Text(
+                  '+${elevation.gain.toStringAsFixed(0)}m / -${elevation.loss.toStringAsFixed(0)}m',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

@@ -71,6 +71,22 @@ extension ActivityStatisticsExtension on ActivityEntity {
 
   double get pausedSpeedKmh => pausedSpeedMps * 3.6;
 
+  String get activePaceMinPerKm {
+    if (activeSpeedKmh == 0) return '--:--';
+    final paceMinutes = 60 / activeSpeedKmh;
+    final minutes = paceMinutes.floor();
+    final seconds = ((paceMinutes - minutes) * 60).round();
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  String get pausedPaceMinPerKm {
+    if (pausedSpeedKmh == 0) return '--:--';
+    final paceMinutes = 60 / pausedSpeedKmh;
+    final minutes = paceMinutes.floor();
+    final seconds = ((paceMinutes - minutes) * 60).round();
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
+
   List<ActivitySegment> get segments => _segmentPoints(points);
 
   List<ActivitySegment> get activeSegments =>
