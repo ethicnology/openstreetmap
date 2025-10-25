@@ -45,8 +45,14 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   void _onUpdateUserLocation(UpdateUserLocation event, Emitter<MapState> emit) {
     if (state.activity != null) {
-      add(ScoreActivity(position: event.position));
+      add(
+        ScoreActivity(
+          position: event.position,
+          overrideIsPaused: event.overrideIsPaused,
+        ),
+      );
     }
+
     emit(state.copyWith(userLocation: event.position));
   }
 
@@ -110,14 +116,16 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     final activity = state.activity!;
     final position = event.position;
 
+    final status =
+        event.overrideIsPaused ?? state.isPaused
+            ? ActivityPointStatusEntity.paused
+            : ActivityPointStatusEntity.active;
+
     try {
       final newPoint = await _scoreActivityUseCase(
         activityId: activity.id,
         position: position,
-        status:
-            state.isPaused
-                ? ActivityPointStatusEntity.paused
-                : ActivityPointStatusEntity.active,
+        status: status,
       );
       final newPoints = [...state.activity!.points, newPoint];
       final updatedActivity = activity.copyWith(points: newPoints);
@@ -126,17 +134,26 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     } catch (e) {
       emit(
         state.copyWith(
-          errorMessage: AppError('Failed to record location: ${e.toString()}'),
+          errorMessage: AppError('$_onScoreActivity: ${e.toString()}'),
         ),
       );
     }
   }
 
-  void _onPauseActivity(PauseActivity event, Emitter<MapState> emit) async {
+  void _onPauseActivity(PauseActivity event, Emitter<MapState> emit) {
     if (state.activity == null) throw ActivityNotStartedError();
 
-    final userPosition = await _getUserLocationUseCase();
-    add(UpdateUserLocation(position: userPosition));
+    // First we score the latest known location before pausing
+    unawaited(
+      _getUserLocationUseCase().then((userPosition) {
+        add(
+          UpdateUserLocation(
+            position: userPosition,
+            overrideIsPaused: state.isPaused,
+          ),
+        );
+      }),
+    );
 
     emit(state.copyWith(isPaused: !state.isPaused));
   }

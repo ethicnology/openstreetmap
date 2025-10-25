@@ -19,7 +19,14 @@ class CeaseActivity extends MapEvent {
 
 class ScoreActivity extends MapEvent {
   final PositionEntity position;
-  const ScoreActivity({required this.position});
+  bool? overrideIsPaused;
+  ScoreActivity({required this.position, this.overrideIsPaused});
+}
+
+class UpdateUserLocation extends MapEvent {
+  final PositionEntity position;
+  bool? overrideIsPaused;
+  UpdateUserLocation({required this.position, this.overrideIsPaused});
 }
 
 class PauseActivity extends MapEvent {
@@ -38,9 +45,4 @@ class ClearError extends MapEvent {
 
 class UpdateElapsedTime extends MapEvent {
   const UpdateElapsedTime();
-}
-
-class UpdateUserLocation extends MapEvent {
-  final PositionEntity position;
-  const UpdateUserLocation({required this.position});
 }
