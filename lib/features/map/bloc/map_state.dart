@@ -18,6 +18,7 @@ class MapState with MapStateMappable {
   final ActivityEntity? activity;
   final Duration elapsedTime;
   final bool isPaused;
+  final bool isFollowingUser;
 
   const MapState({
     this.style,
@@ -29,5 +30,6 @@ class MapState with MapStateMappable {
     this.activity,
     this.elapsedTime = Duration.zero,
     this.isPaused = false,
+    this.isFollowingUser = false,
   });
 }

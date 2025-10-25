@@ -5,7 +5,6 @@ import 'package:latlong2/latlong.dart' show LatLng;
 import 'package:openstreetmap/core/global.dart';
 import 'package:openstreetmap/core/entities/activity_entity.dart';
 import 'package:openstreetmap/core/entities/position_entity.dart';
-import 'package:openstreetmap/core/usecases/get_user_location_use_case.dart';
 import 'package:openstreetmap/features/map/bloc/map_bloc.dart';
 import 'package:openstreetmap/features/map/bloc/map_state.dart';
 import 'package:openstreetmap/features/map/bloc/map_event.dart';
@@ -57,6 +56,17 @@ class _MapPageState extends State<MapPage> {
             _mapController.move(firstPoint.position.toLatLng(), Global.maxZoom);
           },
         ),
+        BlocListener<MapBloc, MapState>(
+          listenWhen:
+              (previous, current) =>
+                  current.isFollowingUser &&
+                  current.userLocation != null &&
+                  previous.userLocation != current.userLocation,
+          listener: (context, state) {
+            final camera = _mapController.camera;
+            _mapController.move(state.userLocation!.toLatLng(), camera.zoom);
+          },
+        ),
       ],
       child: BlocBuilder<MapBloc, MapState>(
         builder: (context, state) {
@@ -75,6 +85,11 @@ class _MapPageState extends State<MapPage> {
                       initialCenter: state.userLocation!.toLatLng(),
                       initialZoom: Global.defaultZoom,
                       maxZoom: Global.maxZoom,
+                      onPositionChanged: (position, hasGesture) {
+                        if (hasGesture && state.isFollowingUser) {
+                          bloc.add(const StopFollowingUser());
+                        }
+                      },
                     ),
                     children: [
                       VectorTileLayer(
@@ -124,14 +139,14 @@ class _MapPageState extends State<MapPage> {
                   heroTag: 'location',
                   onPressed: () {
                     if (state.userLocation == null) return;
-                    GetUserLocationUseCase().call().then((position) {
-                      bloc.add(UpdateUserLocation(position: position));
-                      _mapController.move(
-                        LatLng(position.latitude, position.longitude),
-                        Global.maxZoom,
-                      );
-                    });
+
+                    _mapController.move(
+                      state.userLocation!.toLatLng(),
+                      Global.maxZoom,
+                    );
+                    bloc.add(const ToggleFollowUser());
                   },
+                  backgroundColor: state.isFollowingUser ? Colors.blue : null,
                   child: const Icon(Icons.my_location),
                 ),
 
@@ -238,7 +253,7 @@ class _MapPageState extends State<MapPage> {
           point: LatLng(location.latitude, location.longitude),
           width: 40,
           height: 40,
-          child: const Icon(Icons.my_location, color: Colors.white, size: 24),
+          child: const Icon(Icons.my_location, color: Colors.blue, size: 24),
         ),
       ],
     );

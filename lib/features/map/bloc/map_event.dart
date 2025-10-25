@@ -44,3 +44,11 @@ class ClearError extends MapEvent {
 class UpdateElapsedTime extends MapEvent {
   const UpdateElapsedTime();
 }
+
+class ToggleFollowUser extends MapEvent {
+  const ToggleFollowUser();
+}
+
+class StopFollowingUser extends MapEvent {
+  const StopFollowingUser();
+}

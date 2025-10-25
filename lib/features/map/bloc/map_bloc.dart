@@ -39,6 +39,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<ClearError>(_onClearError);
     on<UpdateElapsedTime>(_onUpdateElapsedTime);
     on<UpdateUserLocation>(_onUpdateUserLocation);
+    on<ToggleFollowUser>(_onToggleFollowUser);
+    on<StopFollowingUser>(_onStopFollowingUser);
 
     add(const InitMap());
   }
@@ -205,5 +207,13 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     } finally {
       emit(state.copyWith(isLoading: false));
     }
+  }
+
+  void _onToggleFollowUser(ToggleFollowUser event, Emitter<MapState> emit) {
+    emit(state.copyWith(isFollowingUser: !state.isFollowingUser));
+  }
+
+  void _onStopFollowingUser(StopFollowingUser event, Emitter<MapState> emit) {
+    emit(state.copyWith(isFollowingUser: false));
   }
 }
