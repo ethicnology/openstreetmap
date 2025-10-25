@@ -8,6 +8,7 @@ import 'package:openstreetmap/core/usecases/start_track_position_use_case.dart';
 import 'package:openstreetmap/core/usecases/score_activity_use_case.dart';
 import 'package:openstreetmap/core/usecases/start_activity_use_case.dart';
 import 'package:openstreetmap/core/usecases/cease_activity_use_case.dart';
+import 'package:openstreetmap/core/usecases/activity_notification_use_case.dart';
 import 'package:openstreetmap/features/map/bloc/map_event.dart';
 import 'package:openstreetmap/features/map/bloc/map_state.dart';
 import 'package:openstreetmap/core/usecases/get_map_tile_url_use_case.dart';
@@ -24,6 +25,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final _ceaseActivityUsecase = CeaseActivityUseCase();
   final _startTrackPositionUsecase = StartTrackPositionUseCase();
   final _getUserLocationUseCase = GetUserLocationUseCase();
+  final _activityNotificationUseCase = ActivityNotificationUseCase();
 
   late StreamSubscription<PositionEntity> _positionStream;
   Timer? _elapsedTimer;
@@ -150,6 +152,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     _elapsedTimer = null;
     _activityStartTime = null;
 
+    await _activityNotificationUseCase.cancelActivityNotification();
+
     emit(
       state.copyWith(
         activity: null,
@@ -167,6 +171,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (_activityStartTime != null && !state.isPaused) {
       final elapsed = DateTime.now().difference(_activityStartTime!);
       emit(state.copyWith(elapsedTime: elapsed));
+
+      _activityNotificationUseCase.showActivityNotification(
+        activity: state.activity!,
+        elapsed: elapsed,
+        isPaused: state.isPaused,
+      );
     }
   }
 

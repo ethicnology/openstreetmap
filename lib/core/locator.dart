@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:openstreetmap/core/usecases/activity_notification_use_case.dart';
 import 'package:openstreetmap/features/activities/bloc/activities_bloc.dart';
 import 'package:openstreetmap/core/datasources/location_gps_data_source.dart';
 import 'package:openstreetmap/core/datasources/map_remote_data_source.dart';
@@ -45,6 +46,10 @@ class Locator {
     );
     getIt.registerLazySingleton<TraceLocalDataSource>(
       () => TraceLocalDataSource(),
+    );
+
+    getIt.registerLazySingleton<ActivityNotificationUseCase>(
+      () => ActivityNotificationUseCase()..initialize(),
     );
   }
 }

@@ -49,6 +49,7 @@ dependencies:
   path_provider: ^2.1.5
   path: ^1.9.1
   dart_mappable: ^4.6.1
+  flutter_local_notifications: ^19.5.0
 
 dev_dependencies:
   flutter_test:
