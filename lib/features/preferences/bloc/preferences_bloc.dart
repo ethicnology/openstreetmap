@@ -1,8 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:openstreetmap/core/entities/preferences_entity.dart';
 import 'package:openstreetmap/core/errors.dart';
+import 'package:openstreetmap/core/locator.dart';
 import 'package:openstreetmap/core/usecases/get_preferences_use_case.dart';
 import 'package:openstreetmap/core/usecases/update_preferences_use_case.dart';
+import 'package:openstreetmap/features/map/bloc/map_bloc.dart';
+import 'package:openstreetmap/features/map/bloc/map_event.dart';
 import 'package:openstreetmap/features/preferences/bloc/preferences_event.dart';
 import 'package:openstreetmap/features/preferences/bloc/preferences_state.dart';
 
@@ -10,13 +12,20 @@ class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
   final _getPreferencesUseCase = GetPreferencesUseCase();
   final _updatePreferencesUseCase = UpdatePreferencesUseCase();
 
-  PreferencesBloc() : super(const PreferencesState()) {
+  PreferencesBloc._({required PreferencesState initialState})
+    : super(initialState) {
     on<LoadPreferences>(_onLoadPreferences);
-    on<UpdateMapTheme>(_onUpdateMapTheme);
-    on<UpdateMapLanguage>(_onUpdateMapLanguage);
-    on<UpdateAccuracy>(_onUpdateAccuracy);
+    on<UpdatePreferences>(_onUpdatePreferences);
+    on<ChangeMapTheme>(_onChangeMapTheme);
+    on<ChangeMapLanguage>(_onChangeMapLanguage);
+    on<ChangeAccuracy>(_onChangeAccuracy);
+  }
 
-    add(const LoadPreferences());
+  static Future<PreferencesBloc> create() async {
+    final getPreferencesUseCase = GetPreferencesUseCase();
+    final preferences = await getPreferencesUseCase();
+    final initialState = PreferencesState(preferences: preferences);
+    return PreferencesBloc._(initialState: initialState);
   }
 
   Future<void> _onLoadPreferences(
@@ -28,57 +37,38 @@ class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
       final preferences = await _getPreferencesUseCase();
       emit(state.copyWith(preferences: preferences, isLoading: false));
     } catch (e) {
-      emit(
-        state.copyWith(errorMessage: AppError(e.toString()), isLoading: false),
-      );
+      emit(state.copyWith(error: AppError(e.toString()), isLoading: false));
     }
   }
 
-  Future<void> _onUpdateMapTheme(
-    UpdateMapTheme event,
-    Emitter<PreferencesState> emit,
-  ) async {
-    if (state.preferences == null) return;
-
-    final updatedPreferences = PreferencesEntity(
-      mapTheme: event.theme,
-      mapLanguage: state.preferences!.mapLanguage,
-      accuracyInMeters: state.preferences!.accuracyInMeters,
-    );
-
-    emit(state.copyWith(preferences: updatedPreferences));
-    await _updatePreferencesUseCase(updatedPreferences);
+  void _onChangeMapTheme(ChangeMapTheme event, Emitter<PreferencesState> emit) {
+    final newPreferences = state.preferences.copyWith(mapTheme: event.theme);
+    emit(state.copyWith(preferences: newPreferences));
   }
 
-  Future<void> _onUpdateMapLanguage(
-    UpdateMapLanguage event,
+  void _onChangeMapLanguage(
+    ChangeMapLanguage event,
     Emitter<PreferencesState> emit,
-  ) async {
-    if (state.preferences == null) return;
-
-    final updatedPreferences = PreferencesEntity(
-      mapTheme: state.preferences!.mapTheme,
+  ) {
+    final newPreferences = state.preferences.copyWith(
       mapLanguage: event.language,
-      accuracyInMeters: state.preferences!.accuracyInMeters,
     );
-
-    emit(state.copyWith(preferences: updatedPreferences));
-    await _updatePreferencesUseCase(updatedPreferences);
+    emit(state.copyWith(preferences: newPreferences));
   }
 
-  Future<void> _onUpdateAccuracy(
-    UpdateAccuracy event,
+  void _onChangeAccuracy(ChangeAccuracy event, Emitter<PreferencesState> emit) {
+    final newPreferences = state.preferences.copyWith(
+      accuracyInMeters: event.accuracyInMeters,
+    );
+    emit(state.copyWith(preferences: newPreferences));
+  }
+
+  Future<void> _onUpdatePreferences(
+    UpdatePreferences event,
     Emitter<PreferencesState> emit,
   ) async {
-    if (state.preferences == null) return;
-
-    final updatedPreferences = PreferencesEntity(
-      mapTheme: state.preferences!.mapTheme,
-      mapLanguage: state.preferences!.mapLanguage,
-      accuracyInMeters: event.accuracy,
-    );
-
-    emit(state.copyWith(preferences: updatedPreferences));
-    await _updatePreferencesUseCase(updatedPreferences);
+    await _updatePreferencesUseCase(event.preferences);
+    emit(state.copyWith(preferences: event.preferences));
+    getIt<MapBloc>().add(InitMap());
   }
 }

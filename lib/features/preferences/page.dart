@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:openstreetmap/core/entities/preferences_entity.dart';
 import 'package:openstreetmap/features/preferences/bloc/preferences_bloc.dart';
@@ -11,33 +10,59 @@ class PreferencesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => PreferencesBloc(),
-      child: Scaffold(
-        appBar: AppBar(title: const Text('Preferences'), centerTitle: true),
-        body: BlocBuilder<PreferencesBloc, PreferencesState>(
-          builder: (context, state) {
-            if (state.isLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
+    return FutureBuilder<PreferencesBloc>(
+      future: PreferencesBloc.create(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-            if (state.preferences == null) {
-              return const Center(child: Text('No preferences found'));
-            }
+        return BlocProvider.value(
+          value: snapshot.data!,
+          child: Scaffold(
+            appBar: AppBar(title: const Text('Preferences'), centerTitle: true),
+            body: BlocBuilder<PreferencesBloc, PreferencesState>(
+              builder: (context, state) {
+                if (state.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _buildMapThemeSection(context, state),
-                const SizedBox(height: 24),
-                _buildMapLanguageSection(context, state),
-                const SizedBox(height: 24),
-                _buildAccuracySection(context, state),
-              ],
-            );
-          },
-        ),
-      ),
+                return ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    _buildMapThemeSection(context, state),
+                    const SizedBox(height: 24),
+                    _buildMapLanguageSection(context, state),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          context.read<PreferencesBloc>().add(
+                            UpdatePreferences(
+                              PreferencesEntity(
+                                mapTheme: state.preferences.mapTheme,
+                                mapLanguage: state.preferences.mapLanguage,
+                                accuracyInMeters:
+                                    state.preferences.accuracyInMeters,
+                              ),
+                            ),
+                          );
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Apply'),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -51,7 +76,7 @@ class PreferencesPage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<MapThemeEntity>(
-          value: state.preferences!.mapTheme,
+          value: state.preferences.mapTheme,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -65,7 +90,7 @@ class PreferencesPage extends StatelessWidget {
               }).toList(),
           onChanged: (value) {
             if (value != null) {
-              context.read<PreferencesBloc>().add(UpdateMapTheme(value));
+              context.read<PreferencesBloc>().add(ChangeMapTheme(value));
             }
           },
         ),
@@ -86,7 +111,7 @@ class PreferencesPage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<MapLanguageEntity>(
-          value: state.preferences!.mapLanguage,
+          value: state.preferences.mapLanguage,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -100,36 +125,7 @@ class PreferencesPage extends StatelessWidget {
               }).toList(),
           onChanged: (value) {
             if (value != null) {
-              context.read<PreferencesBloc>().add(UpdateMapLanguage(value));
-            }
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAccuracySection(BuildContext context, PreferencesState state) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Accuracy in Meters',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          initialValue: state.preferences!.accuracyInMeters.toString(),
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            suffixText: 'm',
-          ),
-          onChanged: (value) {
-            final accuracy = int.tryParse(value);
-            if (accuracy != null) {
-              context.read<PreferencesBloc>().add(UpdateAccuracy(accuracy));
+              context.read<PreferencesBloc>().add(ChangeMapLanguage(value));
             }
           },
         ),

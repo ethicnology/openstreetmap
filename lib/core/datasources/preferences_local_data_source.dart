@@ -22,7 +22,10 @@ class PreferencesLocalDataSource {
   }
 
   Future<PreferencesModel> fetch() async {
-    final preferences = await db.select(db.preferences).getSingle();
+    final preferences =
+        await (db.select(db.preferences)
+          ..where((tbl) => tbl.id.equals(1))).getSingle();
+
     return PreferencesModel(
       mapTheme: preferences.mapTheme,
       mapLanguage: preferences.mapLanguage,

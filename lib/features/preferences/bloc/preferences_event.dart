@@ -8,20 +8,26 @@ class LoadPreferences extends PreferencesEvent {
   const LoadPreferences();
 }
 
-class UpdateMapTheme extends PreferencesEvent {
+class UpdatePreferences extends PreferencesEvent {
+  final PreferencesEntity preferences;
+
+  const UpdatePreferences(this.preferences);
+}
+
+class ChangeMapTheme extends PreferencesEvent {
   final MapThemeEntity theme;
 
-  const UpdateMapTheme(this.theme);
+  const ChangeMapTheme(this.theme);
 }
 
-class UpdateMapLanguage extends PreferencesEvent {
+class ChangeMapLanguage extends PreferencesEvent {
   final MapLanguageEntity language;
 
-  const UpdateMapLanguage(this.language);
+  const ChangeMapLanguage(this.language);
 }
 
-class UpdateAccuracy extends PreferencesEvent {
-  final int accuracy;
+class ChangeAccuracy extends PreferencesEvent {
+  final int accuracyInMeters;
 
-  const UpdateAccuracy(this.accuracy);
+  const ChangeAccuracy(this.accuracyInMeters);
 }

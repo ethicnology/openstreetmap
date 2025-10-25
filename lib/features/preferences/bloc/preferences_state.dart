@@ -6,13 +6,13 @@ part 'preferences_state.mapper.dart';
 
 @MappableClass()
 class PreferencesState with PreferencesStateMappable {
-  final PreferencesEntity? preferences;
+  final PreferencesEntity preferences;
   final bool isLoading;
-  final AppError? errorMessage;
+  final AppError? error;
 
   const PreferencesState({
-    this.preferences,
+    required this.preferences,
     this.isLoading = false,
-    this.errorMessage,
+    this.error,
   });
 }

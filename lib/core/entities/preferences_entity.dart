@@ -1,8 +1,13 @@
+import 'package:dart_mappable/dart_mappable.dart';
+
+part 'preferences_entity.mapper.dart';
+
 enum MapThemeEntity { light, dark }
 
 enum MapLanguageEntity { en, fr }
 
-class PreferencesEntity {
+@MappableClass()
+class PreferencesEntity with PreferencesEntityMappable {
   final MapThemeEntity mapTheme;
   final MapLanguageEntity mapLanguage;
   final int accuracyInMeters;
