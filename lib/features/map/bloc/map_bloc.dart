@@ -44,15 +44,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   }
 
   void _onUpdateUserLocation(UpdateUserLocation event, Emitter<MapState> emit) {
-    if (state.activity != null) {
-      add(
-        ScoreActivity(
-          position: event.position,
-          overrideIsPaused: event.overrideIsPaused,
-        ),
-      );
-    }
-
+    if (state.activity != null) add(ScoreActivity(position: event.position));
     emit(state.copyWith(userLocation: event.position));
   }
 
@@ -115,9 +107,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     final activity = state.activity!;
     final position = event.position;
-
     final status =
-        event.overrideIsPaused ?? state.isPaused
+        state.isPaused
             ? ActivityPointStatusEntity.paused
             : ActivityPointStatusEntity.active;
 
@@ -142,19 +133,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   void _onPauseActivity(PauseActivity event, Emitter<MapState> emit) {
     if (state.activity == null) throw ActivityNotStartedError();
-
-    // First we score the latest known location before pausing
-    unawaited(
-      _getUserLocationUseCase().then((userPosition) {
-        add(
-          UpdateUserLocation(
-            position: userPosition,
-            overrideIsPaused: state.isPaused,
-          ),
-        );
-      }),
-    );
-
     emit(state.copyWith(isPaused: !state.isPaused));
   }
 
