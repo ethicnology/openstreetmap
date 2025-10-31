@@ -36,6 +36,7 @@ android {
         release {
             isShrinkResources = false
             isMinifyEnabled = false
+            signingConfig = null
         }
     }
 }
