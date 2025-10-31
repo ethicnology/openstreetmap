@@ -140,19 +140,13 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     emit(state.copyWith(isPaused: !state.isPaused));
   }
 
-  Future<void> _onCeaseActivity(
-    CeaseActivity event,
-    Emitter<MapState> emit,
-  ) async {
-    final userPosition = await _getUserLocationUseCase();
-    add(UpdateUserLocation(position: userPosition));
-
+  void _onCeaseActivity(CeaseActivity event, Emitter<MapState> emit) {
     _ceaseActivityUsecase(state.activity!.id);
     _elapsedTimer?.cancel();
     _elapsedTimer = null;
     _activityStartTime = null;
 
-    await _activityNotificationUseCase.cancelActivityNotification();
+    _activityNotificationUseCase.cancelActivityNotification();
 
     emit(
       state.copyWith(
