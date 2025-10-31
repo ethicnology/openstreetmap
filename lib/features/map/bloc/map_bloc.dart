@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:openstreetmap/core/errors.dart';
 import 'package:openstreetmap/core/entities/activity_entity.dart';
 import 'package:openstreetmap/core/entities/position_entity.dart';
+import 'package:openstreetmap/core/logs.dart';
 import 'package:openstreetmap/core/usecases/get_user_location_use_case.dart';
 import 'package:openstreetmap/core/usecases/start_track_position_use_case.dart';
 import 'package:openstreetmap/core/usecases/score_activity_use_case.dart';
@@ -68,7 +69,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
       final userPositionStream = await _startTrackPositionUsecase();
       _positionStream = userPositionStream
-          .handleError((error) => print('error: $error'))
+          .handleError((error) => logs.severe('error: $error'))
           .listen((position) => add(UpdateUserLocation(position: position)));
 
       final style = await _getMapConfigUseCase();
