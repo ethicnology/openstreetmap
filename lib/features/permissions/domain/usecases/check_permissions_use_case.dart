@@ -1,4 +1,4 @@
-import 'package:openstreetmap/features/permissions/domain/repositories/permission_repository.dart';
+import 'package:furtive/features/permissions/domain/repositories/permission_repository.dart';
 
 class CheckPermissionsUseCase {
   final _repository = PermissionRepository();

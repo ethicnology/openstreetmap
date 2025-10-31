@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:openstreetmap/core/errors.dart';
+import 'package:furtive/core/errors.dart';
 
 class LocationGpsDataSource {
   StreamSubscription<Position>? _positionStreamSubscription;

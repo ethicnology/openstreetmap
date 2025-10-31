@@ -1,4 +1,4 @@
-import 'package:openstreetmap/core/entities/preferences_entity.dart';
+import 'package:furtive/core/entities/preferences_entity.dart';
 
 sealed class PreferencesEvent {
   const PreferencesEvent();

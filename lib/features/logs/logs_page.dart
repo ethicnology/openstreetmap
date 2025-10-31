@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:openstreetmap/core/logs.dart';
+import 'package:furtive/core/logs.dart';
 
 class LogsPage extends StatefulWidget {
   const LogsPage({super.key});

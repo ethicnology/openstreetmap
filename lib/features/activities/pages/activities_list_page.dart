@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:openstreetmap/core/entities/activity_entity.dart';
-import 'package:openstreetmap/core/extensions.dart';
-import 'package:openstreetmap/features/activities/bloc/activities_bloc.dart';
-import 'package:openstreetmap/features/activities/bloc/activities_event.dart';
-import 'package:openstreetmap/features/activities/bloc/activities_state.dart';
-import 'package:openstreetmap/features/activities/pages/activity_detail_page.dart';
+import 'package:furtive/core/entities/activity_entity.dart';
+import 'package:furtive/core/extensions.dart';
+import 'package:furtive/features/activities/bloc/activities_bloc.dart';
+import 'package:furtive/features/activities/bloc/activities_event.dart';
+import 'package:furtive/features/activities/bloc/activities_state.dart';
+import 'package:furtive/features/activities/pages/activity_detail_page.dart';
 
 class ActivitiesListPage extends StatefulWidget {
   const ActivitiesListPage({super.key});

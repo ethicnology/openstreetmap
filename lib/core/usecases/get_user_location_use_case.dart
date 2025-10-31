@@ -1,5 +1,5 @@
-import 'package:openstreetmap/core/errors.dart';
-import 'package:openstreetmap/core/entities/position_entity.dart';
+import 'package:furtive/core/errors.dart';
+import 'package:furtive/core/entities/position_entity.dart';
 import '../repositories/location_repository.dart';
 
 class GetUserLocationUseCase {

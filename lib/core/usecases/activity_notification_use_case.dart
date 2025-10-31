@@ -1,5 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:openstreetmap/core/entities/activity_entity.dart';
+import 'package:furtive/core/entities/activity_entity.dart';
 
 class ActivityNotificationUseCase {
   static final ActivityNotificationUseCase _instance =

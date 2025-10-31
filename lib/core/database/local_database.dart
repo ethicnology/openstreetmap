@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:openstreetmap/core/database/tables/activities_table.dart';
-import 'package:openstreetmap/core/database/tables/activity_points_table.dart';
-import 'package:openstreetmap/core/database/tables/preferences_table.dart';
+import 'package:furtive/core/database/tables/activities_table.dart';
+import 'package:furtive/core/database/tables/activity_points_table.dart';
+import 'package:furtive/core/database/tables/preferences_table.dart';
 import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';

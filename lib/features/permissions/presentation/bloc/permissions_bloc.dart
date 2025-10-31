@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:openstreetmap/core/errors.dart';
-import 'package:openstreetmap/features/permissions/domain/usecases/check_permissions_use_case.dart';
-import 'package:openstreetmap/features/permissions/domain/usecases/get_permissions_use_case.dart';
-import 'package:openstreetmap/features/permissions/domain/usecases/request_permission_use_case.dart';
-import 'package:openstreetmap/features/permissions/domain/usecases/open_app_settings_use_case.dart';
-import 'package:openstreetmap/features/permissions/presentation/bloc/permissions_event.dart';
-import 'package:openstreetmap/features/permissions/presentation/bloc/permissions_state.dart';
+import 'package:furtive/core/errors.dart';
+import 'package:furtive/features/permissions/domain/usecases/check_permissions_use_case.dart';
+import 'package:furtive/features/permissions/domain/usecases/get_permissions_use_case.dart';
+import 'package:furtive/features/permissions/domain/usecases/request_permission_use_case.dart';
+import 'package:furtive/features/permissions/domain/usecases/open_app_settings_use_case.dart';
+import 'package:furtive/features/permissions/presentation/bloc/permissions_event.dart';
+import 'package:furtive/features/permissions/presentation/bloc/permissions_state.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class PermissionsBloc extends Bloc<PermissionsEvent, PermissionsState> {

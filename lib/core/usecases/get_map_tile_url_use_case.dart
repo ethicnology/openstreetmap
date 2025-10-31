@@ -1,4 +1,4 @@
-import 'package:openstreetmap/core/repositories/preferences_repository.dart';
+import 'package:furtive/core/repositories/preferences_repository.dart';
 import 'package:vector_map_tiles/vector_map_tiles.dart';
 import '../repositories/map_repository.dart';
 

@@ -1,8 +1,8 @@
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:openstreetmap/core/errors.dart';
-import 'package:openstreetmap/core/entities/activity_entity.dart';
-import 'package:openstreetmap/core/entities/position_entity.dart';
-import 'package:openstreetmap/core/entities/trace_entity.dart';
+import 'package:furtive/core/errors.dart';
+import 'package:furtive/core/entities/activity_entity.dart';
+import 'package:furtive/core/entities/position_entity.dart';
+import 'package:furtive/core/entities/trace_entity.dart';
 import 'package:vector_map_tiles/vector_map_tiles.dart';
 
 part 'map_state.mapper.dart';

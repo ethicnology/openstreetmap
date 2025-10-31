@@ -1,5 +1,5 @@
 import 'package:latlong2/latlong.dart';
-import 'package:openstreetmap/core/entities/position_entity.dart';
+import 'package:furtive/core/entities/position_entity.dart';
 
 sealed class MapEvent {
   const MapEvent();

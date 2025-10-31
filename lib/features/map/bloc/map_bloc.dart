@@ -1,20 +1,20 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:openstreetmap/core/errors.dart';
-import 'package:openstreetmap/core/entities/activity_entity.dart';
-import 'package:openstreetmap/core/entities/position_entity.dart';
-import 'package:openstreetmap/core/logs.dart';
-import 'package:openstreetmap/core/usecases/get_user_location_use_case.dart';
-import 'package:openstreetmap/core/usecases/start_track_position_use_case.dart';
-import 'package:openstreetmap/core/usecases/score_activity_use_case.dart';
-import 'package:openstreetmap/core/usecases/start_activity_use_case.dart';
-import 'package:openstreetmap/core/usecases/cease_activity_use_case.dart';
-import 'package:openstreetmap/core/usecases/activity_notification_use_case.dart';
-import 'package:openstreetmap/features/map/bloc/map_event.dart';
-import 'package:openstreetmap/features/map/bloc/map_state.dart';
-import 'package:openstreetmap/core/usecases/get_map_tile_url_use_case.dart';
-import 'package:openstreetmap/core/usecases/get_traces_use_case.dart';
-import 'package:openstreetmap/features/map/error.dart';
+import 'package:furtive/core/errors.dart';
+import 'package:furtive/core/entities/activity_entity.dart';
+import 'package:furtive/core/entities/position_entity.dart';
+import 'package:furtive/core/logs.dart';
+import 'package:furtive/core/usecases/get_user_location_use_case.dart';
+import 'package:furtive/core/usecases/start_track_position_use_case.dart';
+import 'package:furtive/core/usecases/score_activity_use_case.dart';
+import 'package:furtive/core/usecases/start_activity_use_case.dart';
+import 'package:furtive/core/usecases/cease_activity_use_case.dart';
+import 'package:furtive/core/usecases/activity_notification_use_case.dart';
+import 'package:furtive/features/map/bloc/map_event.dart';
+import 'package:furtive/features/map/bloc/map_state.dart';
+import 'package:furtive/core/usecases/get_map_tile_url_use_case.dart';
+import 'package:furtive/core/usecases/get_traces_use_case.dart';
+import 'package:furtive/features/map/error.dart';
 
 const double kSearchHalfSideDegrees = 0.01425;
 

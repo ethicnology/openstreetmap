@@ -1,4 +1,4 @@
-import 'package:openstreetmap/core/entities/trace_entity.dart';
+import 'package:furtive/core/entities/trace_entity.dart';
 import 'package:xml/xml.dart';
 
 class TraceModel {

@@ -1,5 +1,5 @@
-import 'package:openstreetmap/core/database/tables/preferences_table.dart';
-import 'package:openstreetmap/core/entities/preferences_entity.dart';
+import 'package:furtive/core/database/tables/preferences_table.dart';
+import 'package:furtive/core/entities/preferences_entity.dart';
 
 class PreferencesModel {
   final MapThemeColumn mapTheme;

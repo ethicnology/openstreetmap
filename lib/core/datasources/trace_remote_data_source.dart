@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart';
-import 'package:openstreetmap/core/models/trace_model.dart';
+import 'package:furtive/core/models/trace_model.dart';
 
 class TraceRemoteDataSource {
   Future<List<TraceModel>> getPublicTraces(
@@ -11,7 +11,7 @@ class TraceRemoteDataSource {
     int page,
   ) async {
     final uri = Uri.parse(
-      'https://api.openstreetmap.org/api/0.6/trackpoints?bbox=$left,$bottom,$right,$top&page=$page',
+      'https://api.furtive.org/api/0.6/trackpoints?bbox=$left,$bottom,$right,$top&page=$page',
     );
     final response = await http.get(uri);
 

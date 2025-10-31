@@ -2,7 +2,7 @@ import 'package:dart_mappable/dart_mappable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:openstreetmap/core/entities/position_entity.dart';
+import 'package:furtive/core/entities/position_entity.dart';
 
 part 'activity_entity.mapper.dart';
 

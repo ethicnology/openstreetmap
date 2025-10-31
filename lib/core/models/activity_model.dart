@@ -1,6 +1,6 @@
-import 'package:openstreetmap/core/database/tables/activity_points_table.dart';
-import 'package:openstreetmap/core/entities/activity_entity.dart';
-import 'package:openstreetmap/core/entities/position_entity.dart';
+import 'package:furtive/core/database/tables/activity_points_table.dart';
+import 'package:furtive/core/entities/activity_entity.dart';
+import 'package:furtive/core/entities/position_entity.dart';
 
 class ActivityModel {
   final String id;

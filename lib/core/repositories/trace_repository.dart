@@ -1,7 +1,7 @@
-import 'package:openstreetmap/core/datasources/trace_local_data_source.dart';
-import 'package:openstreetmap/core/datasources/trace_remote_data_source.dart';
-import 'package:openstreetmap/core/models/trace_model.dart';
-import 'package:openstreetmap/core/entities/trace_entity.dart';
+import 'package:furtive/core/datasources/trace_local_data_source.dart';
+import 'package:furtive/core/datasources/trace_remote_data_source.dart';
+import 'package:furtive/core/models/trace_model.dart';
+import 'package:furtive/core/entities/trace_entity.dart';
 
 class TraceRepository {
   final remoteTraces = TraceRemoteDataSource();

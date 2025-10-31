@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
-import 'package:openstreetmap/core/database/tables/activities_table.dart';
-import 'package:openstreetmap/core/entities/activity_entity.dart';
+import 'package:furtive/core/database/tables/activities_table.dart';
+import 'package:furtive/core/entities/activity_entity.dart';
 
 @DataClassName('ActivityPointsRow')
 class ActivityPoints extends Table {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:openstreetmap/features/permissions/presentation/pages/permissions_page.dart';
-import 'package:openstreetmap/features/preferences/page.dart';
-import 'package:openstreetmap/features/logs/logs_page.dart';
+import 'package:furtive/features/permissions/presentation/pages/permissions_page.dart';
+import 'package:furtive/features/preferences/page.dart';
+import 'package:furtive/features/logs/logs_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});

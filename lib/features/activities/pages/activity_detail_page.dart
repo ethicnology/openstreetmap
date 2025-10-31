@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:openstreetmap/core/global.dart';
-import 'package:openstreetmap/core/entities/activity_entity.dart';
-import 'package:openstreetmap/core/entities/position_entity.dart';
-import 'package:openstreetmap/core/usecases/get_map_tile_url_use_case.dart';
+import 'package:furtive/core/global.dart';
+import 'package:furtive/core/entities/activity_entity.dart';
+import 'package:furtive/core/entities/position_entity.dart';
+import 'package:furtive/core/usecases/get_map_tile_url_use_case.dart';
 import 'package:vector_map_tiles/vector_map_tiles.dart';
 
 class ActivityDetailPage extends StatefulWidget {

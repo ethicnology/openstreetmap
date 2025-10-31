@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:geolocator/geolocator.dart';
-import 'package:openstreetmap/core/entities/position_entity.dart';
+import 'package:furtive/core/entities/position_entity.dart';
 
 import '../datasources/location_gps_data_source.dart';
 

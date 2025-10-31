@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:openstreetmap/core/errors.dart';
-import 'package:openstreetmap/core/locator.dart';
-import 'package:openstreetmap/core/usecases/get_preferences_use_case.dart';
-import 'package:openstreetmap/core/usecases/update_preferences_use_case.dart';
-import 'package:openstreetmap/features/map/bloc/map_bloc.dart';
-import 'package:openstreetmap/features/map/bloc/map_event.dart';
-import 'package:openstreetmap/features/preferences/bloc/preferences_event.dart';
-import 'package:openstreetmap/features/preferences/bloc/preferences_state.dart';
+import 'package:furtive/core/errors.dart';
+import 'package:furtive/core/locator.dart';
+import 'package:furtive/core/usecases/get_preferences_use_case.dart';
+import 'package:furtive/core/usecases/update_preferences_use_case.dart';
+import 'package:furtive/features/map/bloc/map_bloc.dart';
+import 'package:furtive/features/map/bloc/map_event.dart';
+import 'package:furtive/features/preferences/bloc/preferences_event.dart';
+import 'package:furtive/features/preferences/bloc/preferences_state.dart';
 
 class PreferencesBloc extends Bloc<PreferencesEvent, PreferencesState> {
   final _getPreferencesUseCase = GetPreferencesUseCase();

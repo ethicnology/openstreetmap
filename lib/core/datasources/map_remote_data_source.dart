@@ -1,5 +1,5 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:openstreetmap/core/database/tables/preferences_table.dart';
+import 'package:furtive/core/database/tables/preferences_table.dart';
 import 'package:vector_map_tiles/vector_map_tiles.dart';
 
 class MapRemoteDataSource {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:openstreetmap/core/widgets/bottom_navigation_widget.dart';
-import 'package:openstreetmap/features/permissions/presentation/bloc/permissions_bloc.dart';
-import 'package:openstreetmap/features/permissions/presentation/bloc/permissions_event.dart';
-import 'package:openstreetmap/features/permissions/presentation/bloc/permissions_state.dart';
+import 'package:furtive/core/widgets/bottom_navigation_widget.dart';
+import 'package:furtive/features/permissions/presentation/bloc/permissions_bloc.dart';
+import 'package:furtive/features/permissions/presentation/bloc/permissions_event.dart';
+import 'package:furtive/features/permissions/presentation/bloc/permissions_state.dart';
 
 class PermissionsPage extends StatefulWidget {
   const PermissionsPage({super.key});

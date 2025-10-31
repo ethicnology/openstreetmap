@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
-import 'package:openstreetmap/core/global.dart';
-import 'package:openstreetmap/core/entities/activity_entity.dart';
-import 'package:openstreetmap/core/entities/position_entity.dart';
-import 'package:openstreetmap/features/map/bloc/map_bloc.dart';
-import 'package:openstreetmap/features/map/bloc/map_state.dart';
-import 'package:openstreetmap/features/map/bloc/map_event.dart';
-import 'package:openstreetmap/core/entities/trace_entity.dart';
+import 'package:furtive/core/global.dart';
+import 'package:furtive/core/entities/activity_entity.dart';
+import 'package:furtive/core/entities/position_entity.dart';
+import 'package:furtive/features/map/bloc/map_bloc.dart';
+import 'package:furtive/features/map/bloc/map_state.dart';
+import 'package:furtive/features/map/bloc/map_event.dart';
+import 'package:furtive/core/entities/trace_entity.dart';
 import 'package:vector_map_tiles/vector_map_tiles.dart';
 
 class MapPage extends StatefulWidget {

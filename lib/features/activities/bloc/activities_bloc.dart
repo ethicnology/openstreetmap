@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:openstreetmap/core/errors.dart';
-import 'package:openstreetmap/core/usecases/get_activities_use_case.dart';
-import 'package:openstreetmap/features/activities/bloc/activities_event.dart';
-import 'package:openstreetmap/features/activities/bloc/activities_state.dart';
+import 'package:furtive/core/errors.dart';
+import 'package:furtive/core/usecases/get_activities_use_case.dart';
+import 'package:furtive/features/activities/bloc/activities_event.dart';
+import 'package:furtive/features/activities/bloc/activities_state.dart';
 
 class ActivitiesBloc extends Bloc<ActivitiesEvent, ActivitiesState> {
   final _getActivitiesUseCase = GetActivitiesUseCase();

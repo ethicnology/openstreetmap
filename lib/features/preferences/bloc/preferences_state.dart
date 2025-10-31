@@ -1,6 +1,6 @@
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:openstreetmap/core/entities/preferences_entity.dart';
-import 'package:openstreetmap/core/errors.dart';
+import 'package:furtive/core/entities/preferences_entity.dart';
+import 'package:furtive/core/errors.dart';
 
 part 'preferences_state.mapper.dart';
 

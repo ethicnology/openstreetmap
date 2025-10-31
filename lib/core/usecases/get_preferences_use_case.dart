@@ -1,5 +1,5 @@
-import 'package:openstreetmap/core/entities/preferences_entity.dart';
-import 'package:openstreetmap/core/repositories/preferences_repository.dart';
+import 'package:furtive/core/entities/preferences_entity.dart';
+import 'package:furtive/core/repositories/preferences_repository.dart';
 
 class GetPreferencesUseCase {
   final preferencesRepository = PreferencesRepository();
@@ -10,4 +10,3 @@ class GetPreferencesUseCase {
     return await preferencesRepository.fetch();
   }
 }
-

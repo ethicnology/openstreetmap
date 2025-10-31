@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:openstreetmap/core/entities/preferences_entity.dart';
-import 'package:openstreetmap/features/preferences/bloc/preferences_bloc.dart';
-import 'package:openstreetmap/features/preferences/bloc/preferences_event.dart';
-import 'package:openstreetmap/features/preferences/bloc/preferences_state.dart';
+import 'package:furtive/core/entities/preferences_entity.dart';
+import 'package:furtive/features/preferences/bloc/preferences_bloc.dart';
+import 'package:furtive/features/preferences/bloc/preferences_event.dart';
+import 'package:furtive/features/preferences/bloc/preferences_state.dart';
 
 class PreferencesPage extends StatelessWidget {
   const PreferencesPage({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:openstreetmap/features/activities/pages/activities_list_page.dart';
-import 'package:openstreetmap/features/map/pages/map_page.dart';
-import 'package:openstreetmap/features/settings/settings_page.dart';
+import 'package:furtive/features/activities/pages/activities_list_page.dart';
+import 'package:furtive/features/map/pages/map_page.dart';
+import 'package:furtive/features/settings/settings_page.dart';
 
 class BottomNavigationWidget extends StatefulWidget {
   const BottomNavigationWidget({super.key});

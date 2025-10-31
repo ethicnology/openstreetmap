@@ -1,5 +1,5 @@
-import 'package:openstreetmap/core/entities/trace_entity.dart';
-import 'package:openstreetmap/core/repositories/trace_repository.dart';
+import 'package:furtive/core/entities/trace_entity.dart';
+import 'package:furtive/core/repositories/trace_repository.dart';
 
 class GetTracesUseCase {
   final repository = TraceRepository();

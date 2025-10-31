@@ -1,6 +1,6 @@
-import 'package:openstreetmap/core/datasources/activity_local_data_source.dart';
-import 'package:openstreetmap/core/models/activity_model.dart';
-import 'package:openstreetmap/core/entities/activity_entity.dart';
+import 'package:furtive/core/datasources/activity_local_data_source.dart';
+import 'package:furtive/core/models/activity_model.dart';
+import 'package:furtive/core/entities/activity_entity.dart';
 
 class ActivityRepository {
   final localActivities = ActivityLocalDataSource();

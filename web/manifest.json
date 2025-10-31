@@ -1,6 +1,6 @@
 {
-    "name": "openstreetmap",
-    "short_name": "openstreetmap",
+    "name": "furtive",
+    "short_name": "furtive",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

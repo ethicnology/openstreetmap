@@ -1,5 +1,5 @@
-import 'package:openstreetmap/core/repositories/activity_repository.dart';
-import 'package:openstreetmap/core/repositories/location_repository.dart';
+import 'package:furtive/core/repositories/activity_repository.dart';
+import 'package:furtive/core/repositories/location_repository.dart';
 
 class CeaseActivityUseCase {
   final locationRepository = LocationRepository();

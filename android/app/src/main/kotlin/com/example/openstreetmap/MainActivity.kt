@@ -1,4 +1,4 @@
-package com.example.openstreetmap
+package com.example.furtive
 
 import io.flutter.embedding.android.FlutterActivity
 

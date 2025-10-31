@@ -1,6 +1,6 @@
 import 'package:permission_handler/permission_handler.dart';
-import 'package:openstreetmap/features/permissions/data/datasources/permission_data_source.dart';
-import 'package:openstreetmap/features/permissions/domain/entities/permission_entity.dart';
+import 'package:furtive/features/permissions/data/datasources/permission_data_source.dart';
+import 'package:furtive/features/permissions/domain/entities/permission_entity.dart';
 
 class PermissionRepository {
   final _dataSource = PermissionDataSource();

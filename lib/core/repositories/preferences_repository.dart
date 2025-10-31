@@ -1,6 +1,6 @@
-import 'package:openstreetmap/core/datasources/preferences_local_data_source.dart';
-import 'package:openstreetmap/core/models/preferences_model.dart';
-import 'package:openstreetmap/core/entities/preferences_entity.dart';
+import 'package:furtive/core/datasources/preferences_local_data_source.dart';
+import 'package:furtive/core/models/preferences_model.dart';
+import 'package:furtive/core/entities/preferences_entity.dart';
 
 class PreferencesRepository {
   final preferencesDataSource = PreferencesLocalDataSource();
