@@ -30,10 +30,7 @@ class _PermissionsPageState extends State<PermissionsPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Permissions Required'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Permissions')),
       body: BlocBuilder<PermissionsBloc, PermissionsState>(
         builder: (context, state) {
           if (state.isLoading) {
@@ -79,9 +76,6 @@ class _PermissionsPageState extends State<PermissionsPage>
                               ),
                               Text(permission.description),
                               ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black12,
-                                ),
                                 onPressed:
                                     permission.isGranted
                                         ? null

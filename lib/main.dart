@@ -10,6 +10,7 @@ import 'package:openstreetmap/features/permissions/presentation/pages/check_perm
 import 'package:path_provider/path_provider.dart';
 import 'core/locator.dart';
 import 'core/logs.dart';
+import 'core/theme.dart';
 
 void main() async {
   runZonedGuarded(
@@ -54,7 +55,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Map App',
-        theme: ThemeData.dark(),
+        theme: appTheme,
         home: const CheckPermissionPage(),
       ),
     );

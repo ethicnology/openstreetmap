@@ -22,7 +22,7 @@ class PreferencesPage extends StatelessWidget {
         return BlocProvider.value(
           value: snapshot.data!,
           child: Scaffold(
-            appBar: AppBar(title: const Text('Preferences'), centerTitle: true),
+            appBar: AppBar(title: const Text('Preferences')),
             body: BlocBuilder<PreferencesBloc, PreferencesState>(
               builder: (context, state) {
                 if (state.isLoading) {
