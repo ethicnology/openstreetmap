@@ -33,7 +33,7 @@ class LocalDatabase extends _$LocalDatabase {
       if (details.wasCreated) {
         await into(preferences).insert(
           PreferencesCompanion.insert(
-            mapTheme: MapThemeColumn.light,
+            mapTheme: MapThemeColumn.dark,
             mapLanguage: MapLanguageColumn.en,
             accuracyInMeters: 0,
           ),
