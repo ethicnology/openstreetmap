@@ -120,9 +120,14 @@ class _MapPageState extends State<MapPage> {
                 if (state.isLoading)
                   const Center(child: CircularProgressIndicator()),
                 if (state.activity != null)
-                  ActivityStatsWidget(
-                    activity: state.activity!,
-                    elapsedTime: state.elapsedTime,
+                  Positioned(
+                    top: 50,
+                    left: 0,
+                    right: 0,
+                    child: ActivityStatsWidget(
+                      activity: state.activity!,
+                      elapsedTime: state.elapsedTime,
+                    ),
                   ),
               ],
             ),

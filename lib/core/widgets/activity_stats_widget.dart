@@ -14,66 +14,61 @@ class ActivityStatsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      top: 50,
-      left: 0,
-      right: 0,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-        decoration: BoxDecoration(color: Colors.black),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Flexible(
-                  child: Text(
-                    'Recording Activity',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Text(
-                  elapsedTime.toHHMMSS(),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(color: Colors.black),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Flexible(
+                child: Text(
+                  'Recording Activity',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+              ),
+              Text(
+                elapsedTime.toHHMMSS(),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 6),
+          ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: 145),
+            child: PageView(
+              children: [
+                _buildStatsPage(
+                  label: 'Active',
+                  duration: activity.activeDuration.toHHMMSS(),
+                  distance: activity.activeDistanceInKm.toStringAsFixed(2),
+                  speed: activity.activeSpeedKmh.toStringAsFixed(1),
+                  pace: activity.activePaceMinPerKm,
+                  elevation: activity.activeElevation,
+                ),
+                _buildStatsPage(
+                  label: 'Paused',
+                  duration: activity.pausedDuration.toHHMMSS(),
+                  distance: activity.pausedDistanceInKm.toStringAsFixed(2),
+                  speed: activity.pausedSpeedKmh.toStringAsFixed(1),
+                  pace: activity.pausedPaceMinPerKm,
+                  elevation: null,
+                ),
               ],
             ),
-
-            const SizedBox(height: 6),
-            ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 145),
-              child: PageView(
-                children: [
-                  _buildStatsPage(
-                    label: 'Active',
-                    duration: activity.activeDuration.toHHMMSS(),
-                    distance: activity.activeDistanceInKm.toStringAsFixed(2),
-                    speed: activity.activeSpeedKmh.toStringAsFixed(1),
-                    pace: activity.activePaceMinPerKm,
-                    elevation: activity.activeElevation,
-                  ),
-                  _buildStatsPage(
-                    label: 'Paused',
-                    duration: activity.pausedDuration.toHHMMSS(),
-                    distance: activity.pausedDistanceInKm.toStringAsFixed(2),
-                    speed: activity.pausedSpeedKmh.toStringAsFixed(1),
-                    pace: activity.pausedPaceMinPerKm,
-                    elevation: null,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
