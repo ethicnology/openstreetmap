@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:furtive/core/entities/preferences_entity.dart';
+import 'package:furtive/core/global.dart';
 import 'package:furtive/features/preferences/bloc/preferences_bloc.dart';
 import 'package:furtive/features/preferences/bloc/preferences_event.dart';
 import 'package:furtive/features/preferences/bloc/preferences_state.dart';
@@ -29,31 +30,32 @@ class PreferencesPage extends StatelessWidget {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                return ListView(
-                  padding: const EdgeInsets.all(16),
+                return Column(
                   children: [
                     _buildMapThemeSection(context, state),
                     const SizedBox(height: 24),
                     _buildMapLanguageSection(context, state),
-                    const SizedBox(height: 32),
+                    Spacer(),
                     SizedBox(
                       width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          context.read<PreferencesBloc>().add(
-                            UpdatePreferences(
-                              PreferencesEntity(
-                                mapTheme: state.preferences.mapTheme,
-                                mapLanguage: state.preferences.mapLanguage,
-                                accuracyInMeters:
-                                    state.preferences.accuracyInMeters,
+                      child: Padding(
+                        padding: EdgeInsets.all(Global.spacing),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            context.read<PreferencesBloc>().add(
+                              UpdatePreferences(
+                                PreferencesEntity(
+                                  mapTheme: state.preferences.mapTheme,
+                                  mapLanguage: state.preferences.mapLanguage,
+                                  accuracyInMeters:
+                                      state.preferences.accuracyInMeters,
+                                ),
                               ),
-                            ),
-                          );
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Apply'),
+                            );
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Apply'),
+                        ),
                       ),
                     ),
                   ],

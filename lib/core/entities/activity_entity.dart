@@ -235,8 +235,8 @@ extension ActivityPathExtension on ActivityEntity {
       points: points.map((p) => p.position.toLatLng()).toList(),
       color:
           status == ActivityPointStatusEntity.active
-              ? Colors.blue
-              : Colors.yellow,
+              ? Colors.tealAccent
+              : Colors.teal,
       strokeWidth: 4.0,
     );
   }

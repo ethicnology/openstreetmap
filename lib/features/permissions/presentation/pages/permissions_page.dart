@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:furtive/core/global.dart';
 import 'package:furtive/core/widgets/bottom_navigation_widget.dart';
 import 'package:furtive/features/permissions/presentation/bloc/permissions_bloc.dart';
 import 'package:furtive/features/permissions/presentation/bloc/permissions_event.dart';
@@ -102,23 +103,26 @@ class _PermissionsPageState extends State<PermissionsPage>
                 ),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed:
+                  child: Padding(
+                    padding: EdgeInsets.all(Global.spacing),
+                    child: ElevatedButton(
+                      onPressed:
+                          allRequiredGranted
+                              ? () {
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) =>
+                                            const BottomNavigationWidget(),
+                                  ),
+                                );
+                              }
+                              : null,
+                      child: Text(
                         allRequiredGranted
-                            ? () {
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) =>
-                                          const BottomNavigationWidget(),
-                                ),
-                              );
-                            }
-                            : null,
-                    child: Text(
-                      allRequiredGranted
-                          ? 'Continue'
-                          : 'Grant Required Permissions to Continue',
+                            ? 'Continue'
+                            : 'Grant Required Permissions to Continue',
+                      ),
                     ),
                   ),
                 ),

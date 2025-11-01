@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:furtive/core/widgets/activity_stats_widget.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
 import 'package:furtive/core/global.dart';
 import 'package:furtive/core/entities/activity_entity.dart';
@@ -118,7 +119,11 @@ class _MapPageState extends State<MapPage> {
                 ),
                 if (state.isLoading)
                   const Center(child: CircularProgressIndicator()),
-                if (state.activity != null) _buildActivityStatusWidget(),
+                if (state.activity != null)
+                  ActivityStatsWidget(
+                    activity: state.activity!,
+                    elapsedTime: state.elapsedTime,
+                  ),
               ],
             ),
             floatingActionButton: Column(
@@ -146,7 +151,8 @@ class _MapPageState extends State<MapPage> {
                     );
                     bloc.add(const ToggleFollowUser());
                   },
-                  backgroundColor: state.isFollowingUser ? Colors.blue : null,
+                  backgroundColor:
+                      state.isFollowingUser ? Colors.tealAccent : null,
                   child: const Icon(Icons.my_location),
                 ),
 
@@ -155,7 +161,7 @@ class _MapPageState extends State<MapPage> {
                   FloatingActionButton(
                     heroTag: 'stop',
                     onPressed: () => bloc.add(const CeaseActivity()),
-                    backgroundColor: Colors.red,
+                    backgroundColor: Colors.redAccent,
                     child: const Icon(Icons.stop),
                   ),
                 ],
@@ -165,7 +171,7 @@ class _MapPageState extends State<MapPage> {
                   FloatingActionButton(
                     heroTag: 'pause',
                     onPressed: () => bloc.add(const PauseActivity()),
-
+                    backgroundColor: Colors.tealAccent,
                     child:
                         state.isPaused
                             ? const Icon(Icons.play_arrow)
@@ -251,7 +257,11 @@ class _MapPageState extends State<MapPage> {
           point: LatLng(location.latitude, location.longitude),
           width: 40,
           height: 40,
-          child: const Icon(Icons.my_location, color: Colors.teal, size: 24),
+          child: const Icon(
+            Icons.my_location,
+            color: Colors.tealAccent,
+            size: 24,
+          ),
         ),
       ],
     );
@@ -270,8 +280,8 @@ class _MapPageState extends State<MapPage> {
             LatLng(bounds.south, bounds.east),
             LatLng(bounds.south, bounds.west),
           ],
-          color: Colors.blue.withAlpha(30),
-          borderColor: Colors.blue.withAlpha(60),
+          color: Colors.teal,
+          borderColor: Colors.tealAccent,
           borderStrokeWidth: 2.0,
         ),
       ],
@@ -287,160 +297,6 @@ class _MapPageState extends State<MapPage> {
       south: center.latitude - kSearchHalfSideDegrees,
       east: center.longitude + kSearchHalfSideDegrees,
       west: center.longitude - kSearchHalfSideDegrees,
-    );
-  }
-
-  Widget _buildActivityStatusWidget() {
-    return BlocBuilder<MapBloc, MapState>(
-      builder: (context, state) {
-        final activity = context.watch<MapBloc>().state.activity;
-
-        return Positioned(
-          top: 50,
-          left: 0,
-          right: 0,
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-            decoration: BoxDecoration(color: Colors.black54),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        'Recording Activity',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      state.elapsedTime.toHHMMSS(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                if (activity != null) ...[
-                  const SizedBox(height: 6),
-                  ConstrainedBox(
-                    constraints: BoxConstraints(maxHeight: 145),
-                    child: PageView(
-                      children: [
-                        _buildStatsPage(
-                          label: 'Active',
-                          duration: activity.activeDuration.toHHMMSS(),
-                          distance: activity.activeDistanceInKm.toStringAsFixed(
-                            2,
-                          ),
-                          speed: activity.activeSpeedKmh.toStringAsFixed(1),
-                          pace: activity.activePaceMinPerKm,
-                          elevation: activity.activeElevation,
-                        ),
-                        _buildStatsPage(
-                          label: 'Paused',
-                          duration: activity.pausedDuration.toHHMMSS(),
-                          distance: activity.pausedDistanceInKm.toStringAsFixed(
-                            2,
-                          ),
-                          speed: activity.pausedSpeedKmh.toStringAsFixed(1),
-                          pace: activity.pausedPaceMinPerKm,
-                          elevation: null,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildStatsPage({
-    required String label,
-    required String duration,
-    required String distance,
-    required String speed,
-    required String pace,
-    required ({double gain, double loss})? elevation,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                duration,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Text(
-                '$pace km/m',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '$distance km',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Text(
-                '$speed km/h',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              if (elevation != null) ...[
-                Text(
-                  '+${elevation.gain.toStringAsFixed(0)}m / -${elevation.loss.toStringAsFixed(0)}m',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ],
-      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:furtive/core/widgets/activity_stats_widget.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:furtive/core/global.dart';
 import 'package:furtive/core/entities/activity_entity.dart';
@@ -106,6 +107,8 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
     BuildContext context,
     ActivityEntity activity,
   ) {
+    final stoppedAt = activity.stoppedAt ?? activity.points.last.time;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -120,51 +123,11 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                 top: Radius.circular(20),
               ),
             ),
-            child: _buildStatisticsPanel(activity),
+            child: ActivityStatsWidget(
+              activity: activity,
+              elapsedTime: stoppedAt.difference(activity.startedAt),
+            ),
           ),
-    );
-  }
-
-  Widget _buildStatisticsPanel(ActivityEntity activity) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Active',
-                style: TextStyle(color: Colors.white70, fontSize: 12),
-              ),
-              Text('Duration: ${activity.activeDuration.toHHMMSS()}'),
-              Text(
-                'Distance: ${activity.activeDistanceInKm.toStringAsFixed(2)} km',
-              ),
-              Text('Speed: ${activity.activeSpeedKmh.toStringAsFixed(1)} km/h'),
-              Text(
-                'Elevation: +${activity.activeElevation.gain.toStringAsFixed(0)}m / -${activity.activeElevation.loss.toStringAsFixed(0)}m',
-              ),
-            ],
-          ),
-
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Paused',
-                style: TextStyle(color: Colors.white70, fontSize: 12),
-              ),
-              Text('Duration: ${activity.pausedDuration.toHHMMSS()}'),
-              Text(
-                'Distance: ${activity.pausedDistanceInKm.toStringAsFixed(2)} km',
-              ),
-              Text('Speed: ${activity.pausedSpeedKmh.toStringAsFixed(1)} km/h'),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }
