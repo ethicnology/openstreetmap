@@ -57,12 +57,12 @@ class LocationGpsDataSource {
         useMSLAltitude: true,
         //(Optional) Set foreground notification config to keep the app alive
         //when going to the background
-        foregroundNotificationConfig: const ForegroundNotificationConfig(
-          notificationText:
-              "This app will continue to receive your location when your phone is locked",
-          notificationTitle: "Running in background",
-          enableWakeLock: false,
-        ),
+        // foregroundNotificationConfig: const ForegroundNotificationConfig(
+        //   notificationText:
+        //       "This app will continue to receive your location when your phone is locked",
+        //   notificationTitle: "Running in background",
+        //   enableWakeLock: false,
+        // ),
       );
     } else if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.macOS) {

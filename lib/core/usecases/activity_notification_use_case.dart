@@ -78,18 +78,6 @@ class ActivityNotificationUseCase {
       playSound: false,
       enableVibration: false,
       showWhen: false,
-      actions: <AndroidNotificationAction>[
-        AndroidNotificationAction(
-          isPaused ? 'resume' : 'pause',
-          isPaused ? 'Resume' : 'Pause',
-          showsUserInterface: false,
-        ),
-        const AndroidNotificationAction(
-          'stop',
-          'Stop',
-          showsUserInterface: false,
-        ),
-      ],
     );
 
     final iosDetails = DarwinNotificationDetails(

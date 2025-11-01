@@ -5,6 +5,7 @@ class PermissionDataSource {
   Future<List<PermissionModel>> getPermissions() async {
     final locationWhenInUseStatus = await Permission.locationWhenInUse.status;
     final locationAlwaysStatus = await Permission.locationAlways.status;
+    final notificationStatus = await Permission.notification.status;
 
     final permissions = [
       PermissionModel(
@@ -20,6 +21,14 @@ class PermissionDataSource {
             'Optional: Allows tracking your activities while your lock phone.',
         permission: Permission.locationAlways,
         status: locationAlwaysStatus,
+        isOptional: true,
+      ),
+      PermissionModel(
+        name: 'Notifications',
+        description:
+            'Optional: Allows the app to send you notifications about your activities.',
+        permission: Permission.notification,
+        status: notificationStatus,
         isOptional: true,
       ),
     ];
