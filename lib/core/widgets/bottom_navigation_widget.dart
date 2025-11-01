@@ -51,9 +51,6 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
             curve: Curves.easeInOut,
           );
         },
-        backgroundColor: Colors.black87,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Activities'),

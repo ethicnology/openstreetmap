@@ -84,9 +84,9 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                             : const Center(child: Text('Failed to load map')),
                   ),
                   Positioned(
-                    bottom: 16,
-                    left: 16,
-                    right: 16,
+                    bottom: Global.padding,
+                    left: Global.padding,
+                    right: Global.padding,
                     child: ElevatedButton.icon(
                       onPressed:
                           () => _showStatisticsBottomSheet(
@@ -95,14 +95,6 @@ class _ActivityDetailPageState extends State<ActivityDetailPage> {
                           ),
                       icon: const Icon(Icons.analytics),
                       label: const Text('View Statistics'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black87,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
                     ),
                   ),
                 ],

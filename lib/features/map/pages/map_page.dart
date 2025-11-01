@@ -165,12 +165,11 @@ class _MapPageState extends State<MapPage> {
                   FloatingActionButton(
                     heroTag: 'pause',
                     onPressed: () => bloc.add(const PauseActivity()),
-                    backgroundColor:
-                        state.isPaused ? Colors.blue : Colors.yellow,
+
                     child:
                         state.isPaused
                             ? const Icon(Icons.play_arrow)
-                            : const Icon(Icons.pause, color: Colors.black),
+                            : const Icon(Icons.pause),
                   ),
                 ],
 
@@ -179,7 +178,6 @@ class _MapPageState extends State<MapPage> {
                   FloatingActionButton(
                     heroTag: 'start',
                     onPressed: () => bloc.add(const StartActivity()),
-                    backgroundColor: Colors.green,
                     child: const Icon(Icons.play_arrow),
                   ),
                 ],
@@ -253,7 +251,7 @@ class _MapPageState extends State<MapPage> {
           point: LatLng(location.latitude, location.longitude),
           width: 40,
           height: 40,
-          child: const Icon(Icons.my_location, color: Colors.blue, size: 24),
+          child: const Icon(Icons.my_location, color: Colors.teal, size: 24),
         ),
       ],
     );
